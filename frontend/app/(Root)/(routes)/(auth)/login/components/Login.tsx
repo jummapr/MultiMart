@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 const Login = () => {
   const [visible, setVisible] = useState(false);
@@ -45,7 +46,7 @@ const Login = () => {
   }
   return (
     <div>
-      <Card className="w-[33rem] border">
+      <Card className="w-[25rem] md:w-[30rem]  lg:w-[33rem] border">
         <CardHeader>
           <CardTitle>Welcome again!</CardTitle>
           <CardDescription>Login to your account</CardDescription>
@@ -123,9 +124,11 @@ const Login = () => {
         </CardContent>
         <CardFooter>
           <p className="text-center">Don't have an account?</p>
-          <Button variant={"link"} className="text-primary">
-            Register
-          </Button>
+          <Link href={"/register"}>
+            <Button variant={"link"} className="text-primary">
+              Register
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>

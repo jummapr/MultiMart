@@ -1,5 +1,6 @@
 "use clint";
 
+import "./register.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,7 +47,7 @@ const Register = () => {
     console.log(values);
   }
 
-  const convert2Base24 = (file) => {};
+  const convert2Base24 = (file: any) => {};
 
   const onImageChange = (e: any) => {
     const file = e.target.files[0];
@@ -56,7 +57,7 @@ const Register = () => {
   return (
     <Card className="w-[33rem] border">
       <CardHeader>
-        <CardTitle>Welcome again!</CardTitle>
+        <CardTitle>Register</CardTitle>
         <CardDescription>Register to your account</CardDescription>
       </CardHeader>
       <CardContent>
@@ -78,7 +79,7 @@ const Register = () => {
                 control={Register.control}
                 name="fullName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem  className="input-field-group">
                     <FormLabel>Full name</FormLabel>
                     <FormControl>
                       <Input
@@ -95,7 +96,7 @@ const Register = () => {
                 control={Register.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem  className="input-field-group">
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
                       <Input
@@ -149,6 +150,7 @@ const Register = () => {
                         id="picture"
                         type="file"
                         onChange={(e) => onImageChange(e)}
+                        accept=".jpg,.jpeg,.png"
                       />
                     </FormControl>
                     <FormMessage />
@@ -176,7 +178,7 @@ const Register = () => {
         </Button>
       </CardContent>
       <CardFooter>
-        <p className="text-center">Don't have an account?</p>
+        <p className="text-center">Already have an account?</p>
         <Link href={"/login"}>
           <Button variant={"link"} className="text-primary">
             Login
