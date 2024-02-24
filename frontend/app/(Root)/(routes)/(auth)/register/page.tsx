@@ -5,7 +5,7 @@ import Register from './components/Register'
 
 const RegisterPage = () => {
   return (
-    <div  className='w-full h-screen flex justify-center items-center'>
+    <div  className='w-full h-full py-16 flex justify-center items-center'>
       <Register />
     </div>
   )

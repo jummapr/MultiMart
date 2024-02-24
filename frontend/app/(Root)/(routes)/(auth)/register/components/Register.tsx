@@ -1,8 +1,9 @@
 "use clint";
 
 import "./register.css";
+import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { RegisterFormSchema } from "../Schema";
@@ -28,23 +29,57 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useRegisterMutation } from "@/redux/features/auth/authApiSlice";
+import { useToast } from "@/components/ui/use-toast";
 
 const Register = () => {
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const Register = useForm<z.infer<typeof RegisterFormSchema>>({
+  const [register, { isError, data, error, isSuccess, isLoading }] =
+    useRegisterMutation();
+  const {toast}= useToast();
+
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message || "Registration Successful" as string;
+      toast({
+        description: message,
+      });
+    }
+    if (error) {
+        const errorData = error as any;
+        toast({
+          description: "Your message has been sent.",
+        });
+    }
+    toast({
+      description: "Test is completed"
+    })
+  }, [isSuccess, error]);
+
+
+  const RegisterState = useForm<z.infer<typeof RegisterFormSchema>>({
     resolver: zodResolver(RegisterFormSchema),
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       password: "",
     },
   });
 
-  function handleSubmit(values: z.infer<typeof RegisterFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function handleSubmit(values: z.infer<typeof RegisterFormSchema>) {
+    try {
+      const formData: any = new FormData();
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("file", avatar);
+      await register(formData);
+
+      RegisterState.reset();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const convert2Base24 = (file: any) => {};
@@ -52,35 +87,39 @@ const Register = () => {
   const onImageChange = (e: any) => {
     const file = e.target.files[0];
     setAvatar(file);
+    RegisterState.setValue("file", file.name);
   };
 
   return (
-    <Card className="w-[33rem] border">
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
-        <CardDescription>Register to your account</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex justify-center">
-          {avatar && (
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={URL?.createObjectURL(avatar)} alt="avatar" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          )}
-        </div>
-        <div>
-          <Form {...Register}>
-            <form
-              onSubmit={Register.handleSubmit(handleSubmit)}
-              className="space-y-8"
-            >
+    <Form {...RegisterState}>
+      <form
+        onSubmit={RegisterState.handleSubmit(handleSubmit)}
+        className="space-y-8"
+      >
+        <Card className="w-[33rem] border">
+          <CardHeader>
+            <CardTitle>Register</CardTitle>
+            <CardDescription>Register to your account</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center">
+              {avatar && (
+                <Avatar className="w-20 h-20">
+                  <AvatarImage
+                    src={URL?.createObjectURL(avatar)}
+                    alt="avatar"
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              )}
+            </div>
+            <div>
               <FormField
-                control={Register.control}
-                name="fullName"
+                control={RegisterState.control}
+                name="name"
                 render={({ field }) => (
-                  <FormItem  className="input-field-group">
-                    <FormLabel>Full name</FormLabel>
+                  <FormItem className="input-field-group">
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter your Full Name"
@@ -93,10 +132,10 @@ const Register = () => {
                 )}
               />
               <FormField
-                control={Register.control}
+                control={RegisterState.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem  className="input-field-group">
+                  <FormItem className="input-field-group">
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
                       <Input
@@ -110,7 +149,7 @@ const Register = () => {
                 )}
               />
               <FormField
-                control={Register.control}
+                control={RegisterState.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem className="input-field-group">
@@ -119,6 +158,7 @@ const Register = () => {
                       <div className="relative">
                         <Input
                           type={visible ? "text" : "password"}
+                          {...field}
                           placeholder="Enter your password"
                           className="focus-visible:ring-1 focus-visible:ring-offset-0 "
                         />
@@ -140,7 +180,7 @@ const Register = () => {
                 )}
               />
               <FormField
-                control={Register.control}
+                control={RegisterState.control}
                 name="file"
                 render={({ field }) => (
                   <FormItem className="input-field-group">
@@ -157,35 +197,36 @@ const Register = () => {
                   </FormItem>
                 )}
               />
-            </form>
-          </Form>
-        </div>
+            </div>
 
-        <div className="w-full flex justify-end">
-          <div>
-            <Button variant={"link"} className="text-primary">
-              Forget your password?
+            <div className="w-full flex justify-end">
+              <div>
+                <Button variant={"link"} className="text-primary">
+                  Forget your password?
+                </Button>
+              </div>
+            </div>
+
+            <Button
+              disabled={isLoading}
+              type="submit"
+              // onClick={() => handleSubmit(RegisterState.getValues())}
+              className="w-full text-lg py-5"
+            >
+              Register
             </Button>
-          </div>
-        </div>
-
-        <Button
-          type="submit"
-          onClick={() => handleSubmit(Register.getValues())}
-          className="w-full text-lg py-5"
-        >
-          Register
-        </Button>
-      </CardContent>
-      <CardFooter>
-        <p className="text-center">Already have an account?</p>
-        <Link href={"/login"}>
-          <Button variant={"link"} className="text-primary">
-            Login
-          </Button>
-        </Link>
-      </CardFooter>
-    </Card>
+          </CardContent>
+          <CardFooter>
+            <p className="text-center">Already have an account?</p>
+            <Link href={"/login"}>
+              <Button variant={"link"} className="text-primary">
+                Login
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      </form>
+    </Form>
   );
 };
 
