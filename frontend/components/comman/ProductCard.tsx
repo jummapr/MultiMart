@@ -1,9 +1,20 @@
+"use client"
+
 import React from "react";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import Image from "next/image";
 import { Eye, Heart } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { onOpen } from "@/redux/features/modal/productDetailSlice";
 
 const ProductCard = () => {
+
+  const dispatch = useDispatch()
+
+  const onModalOpen = () => {
+    dispatch(onOpen())
+  }
+
   return (
     <div>
       <Card className="w-[16rem] border-none rounded-lg">
@@ -21,7 +32,7 @@ const ProductCard = () => {
           </div>
           <div className="absolute top-12 right-2">
             <div className="flex justify-center items-center bg-white w-8 h-8 text-center rounded-full hover:bg-primary hover:text-white transition-colors cursor-pointer">
-              <Eye className="w-5 h-5" />
+              <Eye className="w-5 h-5" onClick={onModalOpen} />
             </div>
           </div>
         </CardHeader>

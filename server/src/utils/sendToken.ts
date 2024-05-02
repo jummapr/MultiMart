@@ -15,7 +15,8 @@ interface User {
 export const sendToken = async (
   user: IUser,
   statusCode: number,
-  res: Response
+  res: Response,
+  message: string
 ) => {
   const token = user.getJwtToken();
 
@@ -24,12 +25,12 @@ export const sendToken = async (
     expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     httpOnly: true,
     // secure: true,
-    // sameSite: 'None'
+    sameSite: 'None'
   };
 
   res.status(statusCode).cookie("token",token, {
     expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     httpOnly: true,
-  }).json(new ApiResponse(200,"user account activated successfully",{user,token}))
+  }).json(new ApiResponse(200,message,{user,token}))
 };
 

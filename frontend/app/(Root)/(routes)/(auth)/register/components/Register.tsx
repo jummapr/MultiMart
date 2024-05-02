@@ -29,7 +29,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useRegisterMutation } from "@/redux/features/auth/authApiSlice";
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { useToast } from "@/components/ui/use-toast";
 
 const Register = () => {
@@ -41,7 +41,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      const message = data?.message || "Registration Successful" as string;
+      const message = data?.message || "Email sent to you." as string;
       toast({
         description: message,
       });
@@ -49,12 +49,11 @@ const Register = () => {
     if (error) {
         const errorData = error as any;
         toast({
-          description: "Your message has been sent.",
+          variant: "destructive",
+          description: errorData.data.message,
         });
     }
-    toast({
-      description: "Test is completed"
-    })
+    
   }, [isSuccess, error]);
 
 

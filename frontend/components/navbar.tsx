@@ -1,5 +1,7 @@
-import React from "react";
-import { Button } from "./ui/button";
+"use client";
+
+import React, { use, useState } from "react";
+import { Button, buttonVariants } from "./ui/button";
 import {
   Select,
   SelectContent,
@@ -10,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { languages } from "@/constent";
-import Link from "next/link";
 import { Input } from "./ui/input";
 import {
   BookUser,
@@ -18,6 +19,7 @@ import {
   Heart,
   ListRestart,
   LogOut,
+  Menu,
   MessageCircleMore,
   Radar,
   Search,
@@ -35,47 +37,81 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { useSelector } from "react-redux";
+import Link from "next/link";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { productData } from "@/static/data";
+import Image from "next/image";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
 
 const Navbar = () => {
+  const [isOpen, setOpen] = useState(false);
+  const { user, isAuthenticated } = useSelector((state: any) => state.loadUser);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchData, setSearchData] = useState<any>(null);
+
+  const handleSearchChange = (e: any) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    const filterProducts =
+      productData &&
+      productData.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+    setSearchData(filterProducts);
+  };
+
+  console.log(user, "User Data");
   return (
     <div>
-      <div className="flex justify-center lg:justify-between w-full h-10 bg-[#000000] px-28">
-        <div className="flex flex-row pl-52 text-center  items-center">
-          <h2 className="text-white text-center hidden lg:flex">
-            Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!
-          </h2>
-          <Button variant={"link"} className="text-white hidden lg:flex">
-            Shop now
-          </Button>
-        </div>
-        <div className="flex justify-end">
-          <Select>
-            <SelectTrigger className="w-[130px] border-none ring-offset-0 focus:ring-0 focus:ring-offset-0 bg-inherit text-white">
-              <SelectValue placeholder="Select Language" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Languages</SelectLabel>
-                {languages.map((language) => (
-                  <SelectItem value={language.code} key={language.code}>
-                    {language.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <div className="flex justify-between items-center px-28 w-full h-16 border border-b">
+      <div className="hidden md:flex md:justify-between items-center px-28 w-full h-16 border border-b">
         <div className="flex flex-row">
-          <h2 className="text-[#000000] font-semibold text-2xl">Exclusive</h2>
+          <h2 className="text-primaryBlack font-semibold text-2xl">
+            Exclusive
+          </h2>
         </div>
         <div className="relative">
           <Input
-            className="w-96 bg-[#F5F5F5] border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 "
+            className="w-[20rem] lg:w-[30rem]  bg-[#F5F5F5] border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 "
             placeholder="Search"
+            value={searchTerm}
+            onChange={handleSearchChange}
           />
           <Search className="w-5 h-5 absolute top-2 right-4" />
+          {searchData && searchData.length !== 0 ? (
+              // <ScrollArea>
+
+            <div className="absolute max-h-96 bg-[#F5F5F5] shadow-sm-2 overflow-y-auto rounded-sm z-[9] p-4">
+                {searchData &&
+                  searchData.map((i: any, index: any): any => {
+                    return (
+                      <Link href={`/product/${i._id}`} className="">
+                        <div className="w-full py-3 px-4 flex hover:bg-gray-200 rounded-sm">
+                          <Image
+                            src={`${i.image_Url[0]?.url}`}
+                            alt=""
+                            width={40}
+                            height={40}
+                            className="w-[40px] h-[40px] mr-[10px]"
+                          />
+                          <h1>{i.name}</h1>
+                        </div>
+                      </Link>
+                    );
+                  })}
+            </div>
+              // </ScrollArea>
+          ) : null}
         </div>
         <div className="flex flex-row items-center space-x-4">
           <div className="relative">
@@ -91,53 +127,158 @@ const Navbar = () => {
             </div>
           </div>
           <div>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>JR</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-40">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <User className="mr-2 w-4 h-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <ShoppingBag className="mr-2 w-4 h-4" />
-                    <span>Orders</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <ListRestart className="mr-2 w-4 h-4" />
-                    <span>Refund</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <MessageCircleMore className="mr-2 w-4 h-4" />
-                    <span>Inbox</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Radar className="mr-2 w-4 h-4" />
-                    <span>Track Order</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <CircleDollarSign className="mr-2 w-4 h-4" />
-                    <span>Payment order</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <BookUser className="mr-2 w-4 h-4" />
-                    <span>Address</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <LogOut className="mr-2 w-4 h-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarImage src={user?.avatar?.url} />
+                    <AvatarFallback>JR</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 w-4 h-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <ShoppingBag className="mr-2 w-4 h-4" />
+                      <span>Orders</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <ListRestart className="mr-2 w-4 h-4" />
+                      <span>Refund</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <MessageCircleMore className="mr-2 w-4 h-4" />
+                      <span>Inbox</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Radar className="mr-2 w-4 h-4" />
+                      <span>Track Order</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <CircleDollarSign className="mr-2 w-4 h-4" />
+                      <span>Payment order</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <BookUser className="mr-2 w-4 h-4" />
+                      <span>Address</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <LogOut className="mr-2 w-4 h-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button className="px-6">Login</Button>
+              </Link>
+            )}
+
+            
           </div>
+          <Link href={"/becomeseller"} className={buttonVariants()}>Become seller</Link>
+        </div>
+      </div>
+
+      <div className="md:hidden flex items-center justify-between px-6 sm:px-7 w-full h-16 border border-b">
+        <div className="flex flex-row">
+          <h2 className="text-primaryBlack font-semibold text-2xl">
+            Exclusive
+          </h2>
+        </div>
+
+        <div>
+          <Sheet>
+            <SheetTrigger>
+              <Menu size={35} />
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <div className="relative">
+                  <Input
+                    className="w-[20rem] lg:w-[30rem]  bg-[#F5F5F5] border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 "
+                    placeholder="Search"
+                  />
+                  <Search className="w-5 h-5 absolute top-2 right-10" />
+                </div>
+                <div className="flex flex-row items-center space-x-4">
+                  <div className="relative">
+                    <Heart className="w-7 h-7" />
+                    <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
+                      10
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <ShoppingCart className="w-7 h-7" />
+                    <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
+                      20
+                    </div>
+                  </div>
+                  <div>
+                    {isAuthenticated ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Avatar>
+                            <AvatarImage src={user?.avatar?.url} />
+                            <AvatarFallback>JR</AvatarFallback>
+                          </Avatar>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-40">
+                          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <User className="mr-2 w-4 h-4" />
+                              <span>Profile</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <ShoppingBag className="mr-2 w-4 h-4" />
+                              <span>Orders</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <ListRestart className="mr-2 w-4 h-4" />
+                              <span>Refund</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <MessageCircleMore className="mr-2 w-4 h-4" />
+                              <span>Inbox</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <Radar className="mr-2 w-4 h-4" />
+                              <span>Track Order</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <CircleDollarSign className="mr-2 w-4 h-4" />
+                              <span>Payment order</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <BookUser className="mr-2 w-4 h-4" />
+                              <span>Address</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <LogOut className="mr-2 w-4 h-4" />
+                              <span>Logout</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <Link href="/login">
+                        <Button className="px-6">Login</Button>
+                      </Link>
+                    )}
+                  </div>
+                  <Link href={"/becomeseller"} className={buttonVariants()}>Become seller</Link>
+                </div>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </div>

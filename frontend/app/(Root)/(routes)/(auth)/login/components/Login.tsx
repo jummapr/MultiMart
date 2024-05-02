@@ -1,7 +1,7 @@
 "use client";
 
 import "../login.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,10 +27,21 @@ import {
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import {
+  useActivateAccountMutation,
+  useLoginUserMutation,
+} from "@/redux/features/auth/authApi";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
 
 const Login = () => {
   const [visible, setVisible] = useState(false);
-  // 1. Define your form.
+
+  const { toast } = useToast();
+
+  const [loginUser, { isError, data, error, isSuccess, isLoading }] =
+    useLoginUserMutation();
+
   const Login = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
@@ -39,25 +50,44 @@ const Login = () => {
     },
   });
 
-  function handleSubmit(values: z.infer<typeof LoginFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message;
+      toast({
+        description: message,
+      });
+    }
+    if (error) {
+      const errorData = error as any;
+      console.log(errorData);
+      toast({
+        variant: "destructive",
+        description: errorData.data.message,
+      });
+    }
+  }, [isSuccess, error]);
+
+  async function handleSubmit(values: z.infer<typeof LoginFormSchema>) {
+    await loginUser(values);
+    // try {
+    //   const res = await axios.post("http://localhost:5000/api/v1/user/login",values);
+    //   console.log(res)
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
+
   return (
     <div>
-      <Card className="w-[25rem] md:w-[30rem]  lg:w-[33rem] border">
-        <CardHeader>
-          <CardTitle>Welcome again!</CardTitle>
-          <CardDescription>Login to your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <Form {...Login}>
-              <form
-                onSubmit={Login.handleSubmit(handleSubmit)}
-                className="space-y-8"
-              >
+      <Form {...Login}>
+        <form onSubmit={Login.handleSubmit(handleSubmit)} className="space-y-8">
+          <Card className="w-[25rem] md:w-[30rem]  lg:w-[33rem] border">
+            <CardHeader>
+              <CardTitle>Welcome again!</CardTitle>
+              <CardDescription>Login to your account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
                 <FormField
                   control={Login.control}
                   name="email"
@@ -115,22 +145,22 @@ const Login = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full text-lg py-5">
+                <Button disabled={isLoading} type="submit" className="w-full text-lg py-5">
                   Login
                 </Button>
-              </form>
-            </Form>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <p className="text-center">Don't have an account?</p>
-          <Link href={"/register"}>
-            <Button variant={"link"} className="text-primary">
-              Register
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <p className="text-center">Don't have an account?</p>
+              <Link href={"/register"}>
+                <Button variant={"link"} className="text-primary">
+                  Register
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form>
     </div>
   );
 };

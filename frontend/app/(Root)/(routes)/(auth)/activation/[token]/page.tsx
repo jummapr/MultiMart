@@ -2,9 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useActivateAccountMutation } from "@/redux/features/auth/authApiSlice";
-import LottieFiles from "@/assets/Animation - 1708317901234.json";
-import Lottie from "react-lottie";
+import { useActivateAccountMutation } from "@/redux/features/auth/authApi";
 
 
 const page = () => {
@@ -21,15 +19,6 @@ const page = () => {
       activationToken();
     }
   }, []);
-
-  const defaultOptions = {
-    loop: false,
-    autoplay: false,
-    animationData: LottieFiles,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
 
   return (
     <>

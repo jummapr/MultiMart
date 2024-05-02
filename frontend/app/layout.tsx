@@ -1,12 +1,13 @@
-
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { ReduxProvider } from "@/components/provider/redux-provider";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { useLoadUserQuery } from "../redux/features/api/apiSlice";
+import CustomUserLoad from "@/components/provider/custom-user-load";
+import { ModalProvider } from "@/components/provider/ModalProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,9 @@ export default function RootLayout({
         <ReduxProvider>
           <Navbar />
           <Toaster />
-          {children}
+          <ModalProvider />
+          {/* @ts-ignore */}
+          <CustomUserLoad>{children}</CustomUserLoad>
           <Footer />
         </ReduxProvider>
       </body>

@@ -6,7 +6,7 @@ import React from 'react';
 const Hero = () => {
   return (
     <div className='w-full px-6 py-4'>
-      <div className='flex justify-between items-center px-12 py-9 w-full bg-[#000000]'>
+      <div className='flex justify-between items-center px-12 py-9 w-full bg-primaryBlack'>
         <div className='flex flex-col gap-5'>
           <div className='flex flex-row gap-7 items-center'>
             <Image src={"/assets/appleicon.png"} width={50} height={50} alt={"Apple Icon"}/>

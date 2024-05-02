@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 const Footer = () => {
   return (
-    <div className="w-full flex items-center justify-center bg-[#000000] px-6 py-16 lg:py-16">
+    <div className="w-full flex md:items-center md:justify-center bg-[#000000] px-6 py-16 lg:py-16">
       <div className="h-full flex flex-col sm:flex-row md:flex-row flex-wrap sm:gap-14 md:gap-14 lg:flex-row gap-y-12 lg:gap-32">
 
         <div className="flex flex-col w-auto">

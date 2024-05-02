@@ -8,8 +8,9 @@ import { createActivationToken } from "../utils/generateActiveationLink";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import { sendToken } from "../utils/sendToken";
+import { IGetUserAuthInfoRequest } from "../middlewares/auth.middlewares";
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -45,10 +46,8 @@ export const registerUser = asyncHandler(
         url: uploadedOnCloudinary?.secure_url,
       },
     };
-    console.log("run code 1")
 
     const activationToken = createActivationToken(userData);
-    console.log("Created Activaion Token");
     const activationUrl = `http://localhost:3000/activation/${activationToken}`;
 
     const data = {
@@ -62,11 +61,8 @@ export const registerUser = asyncHandler(
       path.join(__dirname, "../mails/activation.link.ejs"),
       data
     );
-    console.log("will sent to the email");
 
     try {
-      console.log("will sent to the email 2");
-
       await sendMail({
         email: userData.email,
         subject: "Activate your account",
@@ -74,8 +70,10 @@ export const registerUser = asyncHandler(
         data,
       });
       return res
-      .status(201)
-      .json(new ApiResponse(200, `please check your email:- ${userData.email}`));
+        .status(201)
+        .json(
+          new ApiResponse(200, `please check your email:- ${userData.email}`)
+        );
     } catch (error) {
       console.log(error);
       throw new ApiError(500, error.message, error);
@@ -83,47 +81,91 @@ export const registerUser = asyncHandler(
   }
 );
 
-
 // activation user
 
 interface NewUser {
-    name: string,
-    email:string,
-    password: string,
-    avatar: {
-        public_id: string,
-        url: string
-    }
+  name: string;
+  email: string;
+  password: string;
+  avatar: {
+    public_id: string;
+    url: string;
+  };
 }
 
-export const activateUser  = asyncHandler(async (req:Request,res:Response,next:NextFunction) => {
-    const {activation_token} = req.params;
+export const activateUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { activation_token } = req.params;
 
-    const newUser = jwt.verify(activation_token as string, process.env.ACTIVATION_TOKEN_SECRET);
-    console.log("verify JWT token")
+    const newUser = jwt.verify(
+      activation_token as string,
+      process.env.ACTIVATION_TOKEN_SECRET
+    );
+    console.log("verify JWT token");
 
-    if(!newUser) {
-        throw new ApiError(400,"Invalid token")
+    if (!newUser) {
+      throw new ApiError(400, "Invalid token");
     }
 
-    const {name,email, password,avatar} =newUser as NewUser;
-    console.log("destructure the data")
+    const { name, email, password, avatar } = newUser as NewUser;
+    console.log("destructure the data");
 
-    let user = await User.findOne({email});
-    console.log("find the users")
+    let user = await User.findOne({ email });
 
-
-    if(user) {
-        throw new ApiError(400,"User already exist")
+    if (user) {
+      throw new ApiError(400, "User already exist");
     }
 
-     const newUserCreated = await User.create({
-        name,
-        email,
-        password,
-        avatar
+    user = await User.create({
+      name,
+      email,
+      password,
+      avatar,
     });
-    console.log("create user")
 
-    sendToken(newUserCreated,201,res)
-})
+    sendToken(user, 201, res, "user account activated successfully");
+  }
+);
+
+// Login user
+
+export const loginUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      throw new ApiError(400, "All fields are required");
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      throw new ApiError(400, "Invalid credentials");
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      throw new ApiError(400, "Invalid credentials");
+    }
+
+    sendToken(user, 200, res, "User Login Success");
+  }
+);
+
+// Load user
+
+export const loadUser = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const {id} = req.user;
+      const user = await User.findById(id)
+
+      if(!user) {
+        throw new ApiError(400, "User doesn't exist.");
+      }
+
+      res.status(200).json(
+        new ApiResponse(200,"user fetched.",user)
+      )
+  }
+)

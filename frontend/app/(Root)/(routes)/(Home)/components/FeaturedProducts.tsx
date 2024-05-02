@@ -1,5 +1,6 @@
 import ProductCard from "@/components/comman/ProductCard";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 import React from "react";
 
 const FeaturedProducts = () => {
@@ -20,7 +21,7 @@ const FeaturedProducts = () => {
       </div>
 
       <div className='w-full flex justify-center items-center py-12'>
-        <Button>View All products</Button>
+        <Link href={"/products"} className={buttonVariants()}>View All products</Link>
       </div>
     </div>
   );
