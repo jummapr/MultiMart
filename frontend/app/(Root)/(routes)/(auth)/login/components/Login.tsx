@@ -31,11 +31,15 @@ import {
   useActivateAccountMutation,
   useLoginUserMutation,
 } from "@/redux/features/auth/authApi";
+import { redirect } from 'next/navigation'
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Login = () => {
   const [visible, setVisible] = useState(false);
+  const { isAuthenticated } = useSelector((state: any) => state.loadUser);
+  // const navigation = 
 
   const { toast } = useToast();
 
@@ -50,12 +54,16 @@ const Login = () => {
     },
   });
 
+  console.log("Data",data)
+
   useEffect(() => {
     if (isSuccess) {
+      // @ts-ignore
       const message = data?.message;
       toast({
         description: message,
       });
+      redirect("/")
     }
     if (error) {
       const errorData = error as any;
@@ -65,16 +73,14 @@ const Login = () => {
         description: errorData.data.message,
       });
     }
-  }, [isSuccess, error]);
+
+    if(isAuthenticated) {
+      redirect("/")
+    }
+  }, [isSuccess, error,isAuthenticated]);
 
   async function handleSubmit(values: z.infer<typeof LoginFormSchema>) {
     await loginUser(values);
-    // try {
-    //   const res = await axios.post("http://localhost:5000/api/v1/user/login",values);
-    //   console.log(res)
-    // } catch (error) {
-    //   console.log(error)
-    // }
   }
 
   return (

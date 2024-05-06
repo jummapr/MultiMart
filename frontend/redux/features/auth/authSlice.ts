@@ -19,7 +19,7 @@ const authSlice = createSlice({
         logoutUser: (state,action: PayloadAction<{user: any}>) => {
             state.user = null
             state.isAuthenticated = false
-        }
+        },
     }
 })
 

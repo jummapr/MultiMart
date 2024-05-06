@@ -31,9 +31,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { useToast } from "@/components/ui/use-toast";
+import { useSelector } from "react-redux";
+import {redirect} from "next/navigation"
 
 const Register = () => {
   const [visible, setVisible] = useState(false);
+
+  const { isAuthenticated } = useSelector((state: any) => state.loadUser);
+
   const [avatar, setAvatar] = useState(null);
   const [register, { isError, data, error, isSuccess, isLoading }] =
     useRegisterMutation();
@@ -53,8 +58,12 @@ const Register = () => {
           description: errorData.data.message,
         });
     }
+
+    if(isAuthenticated) {
+      redirect("/")
+    }
     
-  }, [isSuccess, error]);
+  }, [isSuccess, error,isAuthenticated]);
 
 
   const RegisterState = useForm<z.infer<typeof RegisterFormSchema>>({

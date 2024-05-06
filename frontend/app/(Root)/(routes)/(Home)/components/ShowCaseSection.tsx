@@ -20,7 +20,9 @@ const ShowCaseSection = () => {
         <Link href={"/bestselling"} className={cn(buttonVariants(),"px-6")}>View All</Link>
         </div>
         <div className='flex w-full flex-wrap flex-row  items-center gap-7 pt-10 pl-4'>
-          <ProductCard />
+         <Link href={"/product/havit hv-G92 gamepad"}>
+         <ProductCard />
+         </Link>
           <ProductCard />
           <ProductCard />
           <ProductCard />

@@ -50,7 +50,15 @@ import {
 import { productData } from "@/static/data";
 import Image from "next/image";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setOpen] = useState(false);
@@ -89,29 +97,29 @@ const Navbar = () => {
           />
           <Search className="w-5 h-5 absolute top-2 right-4" />
           {searchData && searchData.length !== 0 ? (
-              // <ScrollArea>
+            // <ScrollArea>
 
             <div className="absolute max-h-96 bg-[#F5F5F5] shadow-sm-2 overflow-y-auto rounded-sm z-[9] p-4">
-                {searchData &&
-                  searchData.map((i: any, index: any): any => {
-                    return (
-                      <Link href={`/product/${i._id}`} className="">
-                        <div className="w-full py-3 px-4 flex hover:bg-gray-200 rounded-sm">
-                          <Image
-                            src={`${i.image_Url[0]?.url}`}
-                            alt=""
-                            width={40}
-                            height={40}
-                            className="w-[40px] h-[40px] mr-[10px]"
-                          />
-                          <h1>{i.name}</h1>
-                        </div>
-                      </Link>
-                    );
-                  })}
+              {searchData &&
+                searchData.map((i: any, index: any): any => {
+                  return (
+                    <Link href={`/product/${i._id}`} className="">
+                      <div className="w-full py-3 px-4 flex hover:bg-gray-200 rounded-sm">
+                        <Image
+                          src={`${i.image_Url[0]?.url}`}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="w-[40px] h-[40px] mr-[10px]"
+                        />
+                        <h1>{i.name}</h1>
+                      </div>
+                    </Link>
+                  );
+                })}
             </div>
-              // </ScrollArea>
-          ) : null}
+          ) : // </ScrollArea>
+          null}
         </div>
         <div className="flex flex-row items-center space-x-4">
           <div className="relative">
@@ -139,14 +147,18 @@ const Navbar = () => {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <User className="mr-2 w-4 h-4" />
-                      <span>Profile</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <ShoppingBag className="mr-2 w-4 h-4" />
-                      <span>Orders</span>
-                    </DropdownMenuItem>
+                    <Link href={"/profile"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <User className="mr-2 w-4 h-4" />
+                        <span>Profile</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/orders"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <ShoppingBag className="mr-2 w-4 h-4" />
+                        <span>Orders</span>
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem className="cursor-pointer">
                       <ListRestart className="mr-2 w-4 h-4" />
                       <span>Refund</span>
@@ -179,10 +191,10 @@ const Navbar = () => {
                 <Button className="px-6">Login</Button>
               </Link>
             )}
-
-            
           </div>
-          <Link href={"/becomeseller"} className={buttonVariants()}>Become seller</Link>
+          <Link href={"/becomeseller"} className={buttonVariants()}>
+            Become seller
+          </Link>
         </div>
       </div>
 
@@ -274,7 +286,9 @@ const Navbar = () => {
                       </Link>
                     )}
                   </div>
-                  <Link href={"/becomeseller"} className={buttonVariants()}>Become seller</Link>
+                  <Link href={"/becomeseller"} className={buttonVariants()}>
+                    Become seller
+                  </Link>
                 </div>
               </SheetHeader>
             </SheetContent>
