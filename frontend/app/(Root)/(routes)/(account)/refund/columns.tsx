@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 export type Orders = {
-    id: string,
+    orderId: string,
     status: "Pending" | "Processing" | "Success" | "Failed",
     itemQty: number,
     total: string
@@ -11,8 +11,8 @@ export type Orders = {
 
 export const columns: ColumnDef<Orders>[] = [
     {
-      accessorKey: "id",
-      header: "ID",
+      accessorKey: "orderId",
+      header: "Order ID",
     },
     {
       accessorKey: "status",

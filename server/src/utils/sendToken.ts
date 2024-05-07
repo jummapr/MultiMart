@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { IUser } from "../models/user.model";
 import ApiResponse from "./ApiResponse";
+import { IShopCreate } from "../controllers/user.controller";
 
 interface User {
   name: string;
@@ -13,7 +14,7 @@ interface User {
 }
 
 export const sendToken = async (
-  user: IUser,
+  user: IUser | any,
   statusCode: number,
   res: Response,
   message: string

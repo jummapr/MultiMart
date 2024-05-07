@@ -19,9 +19,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
 
 const ProfilePage = () => {
-  const { user, isAuthenticated } = useSelector((state: any) => state.loadUser);
+
+  useAuthRedirect()
+
+  const { user } = useSelector((state: any) => state.loadUser);
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {

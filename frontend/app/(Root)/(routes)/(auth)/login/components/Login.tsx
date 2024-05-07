@@ -28,7 +28,6 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import {
-  useActivateAccountMutation,
   useLoginUserMutation,
 } from "@/redux/features/auth/authApi";
 import { redirect } from 'next/navigation'

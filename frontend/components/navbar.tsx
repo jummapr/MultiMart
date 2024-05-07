@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button, buttonVariants } from "./ui/button";
 import {
   Select,
@@ -59,12 +59,20 @@ import {
   CommandList,
 } from "./ui/command";
 import { usePathname } from "next/navigation";
+import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
+import { useToast } from "./ui/use-toast";
+import { redirect } from 'next/navigation'
 
 const Navbar = () => {
   const [isOpen, setOpen] = useState(false);
   const { user, isAuthenticated } = useSelector((state: any) => state.loadUser);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState<any>(null);
+
+  const [logoutUser, { isLoading: isLogoutLoading,isSuccess,data }] = useLogoutUserMutation();
+
+    const { toast } = useToast();
+    console.log(data)
 
   const handleSearchChange = (e: any) => {
     const term = e.target.value;
@@ -79,7 +87,12 @@ const Navbar = () => {
     setSearchData(filterProducts);
   };
 
-  console.log(user, "User Data");
+  const handleLogout = async () => {
+      await logoutUser(); 
+      toast({ title: "User logged out successfully"});
+      redirect("/login")
+  };
+
   return (
     <div>
       <div className="hidden md:flex md:justify-between items-center px-28 w-full h-16 border border-b">
@@ -143,7 +156,7 @@ const Navbar = () => {
                     <AvatarFallback>JR</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40">
+                <DropdownMenuContent className="w-48">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
@@ -159,27 +172,35 @@ const Navbar = () => {
                         <span>Orders</span>
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <ListRestart className="mr-2 w-4 h-4" />
-                      <span>Refund</span>
-                    </DropdownMenuItem>
+                    <Link href={"/refund"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <ListRestart className="mr-2 w-4 h-4" />
+                        <span>Refund</span>
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem className="cursor-pointer">
                       <MessageCircleMore className="mr-2 w-4 h-4" />
                       <span>Inbox</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Radar className="mr-2 w-4 h-4" />
-                      <span>Track Order</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <CircleDollarSign className="mr-2 w-4 h-4" />
-                      <span>Payment order</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <BookUser className="mr-2 w-4 h-4" />
-                      <span>Address</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <Link href={"/trackorders"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Radar className="mr-2 w-4 h-4" />
+                        <span>Track Order</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/payment/method"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <CircleDollarSign className="mr-2 w-4 h-4" />
+                        <span>Payment Method</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/address"}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <BookUser className="mr-2 w-4 h-4" />
+                        <span>Address</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                       <LogOut className="mr-2 w-4 h-4" />
                       <span>Logout</span>
                     </DropdownMenuItem>
@@ -192,7 +213,7 @@ const Navbar = () => {
               </Link>
             )}
           </div>
-          <Link href={"/becomeseller"} className={buttonVariants()}>
+          <Link href={"/shop-create"} className={buttonVariants()}>
             Become seller
           </Link>
         </div>
@@ -273,7 +294,7 @@ const Navbar = () => {
                               <BookUser className="mr-2 w-4 h-4" />
                               <span>Address</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem  onClick={handleLogout} className="cursor-pointer">
                               <LogOut className="mr-2 w-4 h-4" />
                               <span>Logout</span>
                             </DropdownMenuItem>

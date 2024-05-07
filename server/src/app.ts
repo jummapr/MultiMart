@@ -31,7 +31,9 @@ app.use(bodyParser.urlencoded());
 
 // import route
 import userRoute from "./routes/user.route";
+import shopRoute from "./routes/shop.route"
 
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/shop", shopRoute);
 
 export default app;

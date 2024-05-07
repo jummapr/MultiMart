@@ -16,12 +16,12 @@ const authSlice = createSlice({
             console.log(action)
             state.isAuthenticated = true
         },
-        logoutUser: (state,action: PayloadAction<{user: any}>) => {
+        logoutUser: (state) => {
             state.user = null
             state.isAuthenticated = false
         },
     }
 })
 
-export const {useLoadUser} = authSlice.actions
+export const {useLoadUser,logoutUser} = authSlice.actions
 export default authSlice

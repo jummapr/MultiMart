@@ -1,21 +1,18 @@
-import React from 'react'
+"use client"
+
+import { DataTable } from "@/components/ui/data-table";
+import React from "react";
+import { columns } from "./columns";
+import useAuthRedirect from "@/hooks/useAuthRedirect";
+import Orders from "./Orders";
 
 const OrdersPage = () => {
 
-    const TableData = [
-        {
-            id: "88787adhtfkkdgftbfhg",
-            status: "Processing",
-            itemQty: 1,
-            total: "us$ 200"
-        }
-    ]
+  useAuthRedirect()
 
   return (
-    <div>
-      Orders Page
-    </div>
-  )
-}
+    <Orders />
+  );
+};
 
-export default OrdersPage
+export default OrdersPage;
