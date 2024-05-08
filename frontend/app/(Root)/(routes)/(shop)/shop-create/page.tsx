@@ -19,6 +19,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ import { useShopCreateApiMutation } from "@/redux/features/auth/authApi";
 const ShopCreate = () => {
   const [visible, setVisible] = useState(false);
 
-  const { isAuthenticated } = useSelector((state: any) => state.loadUser);
+  const { isSeller } = useSelector((state: any) => state.seller);
 
   const [avatar, setAvatar] = useState(null);
   const [shopCreateApi, { isError, data, error, isSuccess, isLoading }] =
@@ -54,7 +55,11 @@ const ShopCreate = () => {
           description: errorData?.data?.message,
         });
     }
-  }, [isSuccess, error,isAuthenticated]);
+    
+    if(isSeller) {
+      redirect("/")
+    }
+  }, [isSuccess, error,isSeller]);
 
 
   const ShopCreateionState = useForm<z.infer<typeof ShopCreateSchema>>({
@@ -82,9 +87,7 @@ const ShopCreate = () => {
       formData.append("password", values.password);
       formData.append("file", avatar);
       await shopCreateApi(formData);
-
-      console.log(formData)
-
+      setAvatar(null)
       ShopCreateionState.reset();
     } catch (error) {
       console.log(error);
@@ -108,7 +111,7 @@ const ShopCreate = () => {
       >
         <Card className="w-[33rem] border">
           <CardHeader>
-            <CardDescription>Register as seller</CardDescription>
+            <CardTitle>Register as seller</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-center">
@@ -147,6 +150,7 @@ const ShopCreate = () => {
                   <FormItem className="input-field-group">
                     <FormLabel>Phone number</FormLabel>
                     <FormControl>
+                      {/* @ts-ignore */}
                       <Input
                       type="number"
                         placeholder="Enter your shop name"
@@ -199,6 +203,7 @@ const ShopCreate = () => {
                   <FormItem className="input-field-group">
                     <FormLabel>Zip Code</FormLabel>
                     <FormControl>
+                      {/* @ts-ignore */}
                       <Input
                       type="number"
                         placeholder="Enter your Email"
@@ -277,10 +282,10 @@ const ShopCreate = () => {
             </Button>
           </CardContent>
           <CardFooter>
-            <p className="text-center">Already have an account?</p>
-            <Link href={"/login"}>
+            <p className="text-center">Already have a shop?</p>
+            <Link href={"/shop-login"}>
               <Button variant={"link"} className="text-primary">
-                Login
+                Login to shop
               </Button>
             </Link>
           </CardFooter>

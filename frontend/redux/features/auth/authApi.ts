@@ -1,5 +1,6 @@
 import { apiSlice } from "../api/apiSlice";
-import { logoutUser, useLoadUser } from "./authSlice";
+import {  logoutUser, useLoadUser } from "./authSlice";
+import { loadSellerUser } from "./sellerSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -71,6 +72,30 @@ export const authApiSlice = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+
+    loginToShop: builder.mutation({
+      query: (data: any) => ({
+        url: "shop/shop-login",
+        method: "POST",
+        body: data,
+        credentials: "include" as const,
+      }),
+
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          console.log("state data",result.data);
+          dispatch(
+            loadSellerUser({
+              shopUserData: result.data.user,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    })
   }),
 });
 
@@ -80,5 +105,6 @@ export const {
   useLoginUserMutation,
   useLogoutUserMutation,
   useShopCreateApiMutation,
-  useActivateShopMutation
+  useActivateShopMutation,
+  useLoginToShopMutation
 } = authApiSlice;

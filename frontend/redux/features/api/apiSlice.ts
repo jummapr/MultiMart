@@ -1,6 +1,7 @@
 import type { Action, PayloadAction } from '@reduxjs/toolkit'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {useLoadUser, userLoggedIn} from "../auth/authSlice"
+import {useLoadUser} from "../auth/authSlice"
+import { loadSellerUser } from '../auth/sellerSlice';
 
 
 export const apiSlice = createApi({
@@ -23,6 +24,29 @@ export const apiSlice = createApi({
                     dispatch(
                         useLoadUser({
                             user: result.data.data
+                        })
+                    )
+                } catch (error:any) {
+                  console.log(error);
+                    
+                }
+            }
+        }),
+
+        loadSeller: builder.query({
+            query: () => ({
+                url: 'shop/load-seller',
+                method:"GET",
+                credentials: "include" as const,
+            }),
+
+            async onQueryStarted(arg:any, {queryFulfilled, dispatch}) {
+                try {
+                    const result=await queryFulfilled;
+                    console.log(result.data)
+                    dispatch(
+                        loadSellerUser({
+                            shopUserData: result.data
                         })
                     )
                 } catch (error:any) {

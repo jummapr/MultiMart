@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import { sendToken } from "../utils/sendToken";
 import { IGetUserAuthInfoRequest } from "../middlewares/auth.middlewares";
 import Shop from "../models/shop.model";
+import { sendShopToken } from "../utils/sendShopToken";
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -311,6 +312,48 @@ export const activateShop = asyncHandler(
       avatar
     });
 
-    sendToken(seller, 201, res, "user account activated successfully");
+    sendShopToken(seller, 201, res, "user shop activated successfully");
+  }
+);
+
+
+// Login to shop
+
+export const LoginToShop = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      throw new ApiError(400, "All fields are required");
+    }
+
+    const user = await Shop.findOne({ email }).select("+password");
+
+    if (!user) {
+      throw new ApiError(400, "Invalid credentials");
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      throw new ApiError(400, "Invalid credentials");
+    }
+
+    sendShopToken(user, 201, res, "user login to shop successfully.");
+  }
+)
+
+
+export const loadSellerUser = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    console.log(req.user)
+    const { id } = req.user;
+    const user = await Shop.findById(id);
+
+    if (!user) {
+      throw new ApiError(400, "Seller doesn't exist.");
+    }
+
+    res.status(200).json(new ApiResponse(200, "Seller fetched.", user));
   }
 );
