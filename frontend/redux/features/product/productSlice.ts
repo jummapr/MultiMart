@@ -6,7 +6,7 @@ const initialState = {
 };
 
 const productSlice = createSlice({
-  name: "seller",
+  name: "event",
   initialState,
   reducers: {
     createProductData: (state, action: PayloadAction<{ product: any }>) => {

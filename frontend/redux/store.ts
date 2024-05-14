@@ -6,6 +6,7 @@ import authSlice from "./features/auth/authSlice";
 import productDetailModal from "./features/modal/productDetailSlice";
 import sellerSlice from "./features/auth/sellerSlice";
 import productSlice from "./features/product/productSlice";
+import eventSlice from "./features/event/eventSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     [productDetailModal.reducerPath]: productDetailModal.reducer,
     seller: sellerSlice.reducer,
     product: productSlice.reducer,
+    event: eventSlice.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

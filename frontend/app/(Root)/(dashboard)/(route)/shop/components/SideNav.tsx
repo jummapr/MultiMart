@@ -46,7 +46,12 @@ function SideNav() {
     {
       label: "All Event",
       icon: CalendarPlus,
-      href: "/shop/transaction",
+      href: "/shop/all-event",
+    },
+    {
+      label: "Create Event",
+      icon: CalendarPlus,
+      href: "/shop/create-event",
     },
     {
       label: "Withdraw Money",

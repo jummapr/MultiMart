@@ -3,17 +3,18 @@ import ApiResponse from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import { NextFunction, Request, Response } from "express";
 import uploadOnCloudinary, { deleteTheOldPicture } from "../utils/cloudinary";
-import ejs from "ejs";
-import path from "path";
-import Product from "../models/product.model";
+import Event from "../models/event.model";
 import Shop from "../models/shop.model";
 
-export const createProduct = asyncHandler(
+export const createEvent = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
       name,
       description,
       category,
+      start_date,
+      finish_date,
+      status,
       tags,
       originalPrice,
       discountPrice,
@@ -36,10 +37,10 @@ export const createProduct = asyncHandler(
     }
 
     const files: any = req.files;
-    console.log("Files", files);
+    // console.log("Files", files);
 
     if (!files || files.length === 0) {
-      return res.status(400).send("No images provided.");
+      throw new ApiError(400, "No image found.");
     }
 
     const uploadPromises = files.map((file: any) =>
@@ -50,13 +51,16 @@ export const createProduct = asyncHandler(
 
     const images = uploadResults.map((result) => ({
       public_id: result?.public_id,
-      url: result?.secure_url, // or result.url depending on your preference
+      url: result?.secure_url,
     }));
 
     const productData = {
       name,
       description,
       category,
+      start_date,
+      finish_date,
+      status,
       tags,
       originalPrice,
       discountPrice,
@@ -66,16 +70,17 @@ export const createProduct = asyncHandler(
       shop,
     };
 
-    const product = await Product.create(productData);
+    const event = await Event.create(productData);
 
     res
       .status(201)
-      .json(new ApiResponse(200, "Product created successfully.", product));
+      .json(new ApiResponse(200, "Event created successfully.", event));
   }
 );
 
 // get all product from shop
-export const getAllProduct = asyncHandler(
+
+export const getAllEvents = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const shopId = req.params.shopId;
 
@@ -83,46 +88,47 @@ export const getAllProduct = asyncHandler(
       throw new ApiError(400, "Shop ID is required.");
     }
 
-    const product = await Product.find({ shopId });
+    const event = await Event.find({ shopId });
 
-    if (!product) {
+    if (!event) {
       throw new ApiError(
         404,
-        "product not found. Please ensure the Shop ID is correct."
+        "Event not found. Please ensure the Shop ID is correct."
       );
     }
 
     res
       .status(201)
-      .json(new ApiResponse(200, "Product fetched successfully.", product));
+      .json(new ApiResponse(200, "Event fetched successfully.", event));
   }
 );
 
-// delete product
-export const deleteProductProduct = asyncHandler(
+// delete event
+
+export const deleteEvent = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const ProductId = req.params.id;
-    if (!ProductId) {
-      throw new ApiError(400, "Product ID is required.");
+    const eventId = req.params.id;
+    if (!eventId) {
+      throw new ApiError(400, "Event ID is required.");
     }
 
-    const product = await Product.findById({ _id: ProductId });
+    const event = await Event.findById({ _id: eventId });
 
-    if (!product) {
-      throw new ApiError(404, "Product not found.");
+    if (!event) {
+      throw new ApiError(404, "Event not found.");
     }
 
-    if (product.images && product.images.length > 0) {
-      product.images.map(async (item) => {
+    if (event.images && event.images.length > 0) {
+      event.images.map(async (item) => {
         const deletedImages = await deleteTheOldPicture(item.public_id);
         console.log("Files Deleted", deletedImages);
       });
     }
 
-    await product.deleteOne();
+    await event.deleteOne();
 
     res
       .status(200)
-      .json(new ApiResponse(200, "Product deleted successfully.", product));
+      .json(new ApiResponse(200, "Event deleted successfully.", event));
   }
 );
