@@ -32,7 +32,7 @@ import Link from "next/link";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { useToast } from "@/components/ui/use-toast";
 import { useSelector } from "react-redux";
-import {redirect} from "next/navigation"
+import { redirect } from "next/navigation";
 
 const Register = () => {
   const [visible, setVisible] = useState(false);
@@ -42,29 +42,27 @@ const Register = () => {
   const [avatar, setAvatar] = useState(null);
   const [register, { isError, data, error, isSuccess, isLoading }] =
     useRegisterMutation();
-  const {toast}= useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isSuccess) {
-      const message = data?.message || "Email sent to you." as string;
+      const message = data?.message || ("Email sent to you." as string);
       toast({
         description: message,
       });
     }
     if (error) {
-        const errorData = error as any;
-        toast({
-          variant: "destructive",
-          description: errorData.data.message,
-        });
+      const errorData = error as any;
+      toast({
+        variant: "destructive",
+        description: errorData.data.message,
+      });
     }
 
-    if(isAuthenticated) {
-      redirect("/")
+    if (isAuthenticated) {
+      redirect("/");
     }
-    
-  }, [isSuccess, error,isAuthenticated]);
-
+  }, [isSuccess, error, isAuthenticated]);
 
   const RegisterState = useForm<z.infer<typeof RegisterFormSchema>>({
     resolver: zodResolver(RegisterFormSchema),
@@ -89,8 +87,6 @@ const Register = () => {
       console.log(error);
     }
   }
-
-  const convert2Base24 = (file: any) => {};
 
   const onImageChange = (e: any) => {
     const file = e.target.files[0];

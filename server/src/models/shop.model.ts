@@ -44,6 +44,7 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
+      required: true
     },
     address: {
       type: String,

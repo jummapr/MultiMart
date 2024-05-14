@@ -1,6 +1,6 @@
 import { apiSlice } from "../api/apiSlice";
-import {  logoutUser, useLoadUser } from "./authSlice";
-import { loadSellerUser } from "./sellerSlice";
+import { logoutUser, useLoadUser } from "./authSlice";
+import { loadSellerUser, logoutShop } from "./sellerSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -43,16 +43,16 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    logoutUser: builder.mutation<void,void>({
+    logoutUser: builder.mutation<void, void>({
       query: () => ({
         url: "user/logout",
         method: "GET",
         credentials: "include" as const,
       }),
 
-      async onQueryStarted(arg:any,{queryFulfilled,dispatch}) {
-        dispatch(logoutUser())
-      }
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }) {
+        dispatch(logoutUser());
+      },
     }),
     shopCreateApi: builder.mutation({
       query: (data: any) => ({
@@ -81,11 +81,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
 
-
       async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
         try {
           const result = await queryFulfilled;
-          console.log("state data",result.data);
+          console.log("state data", result.data);
           dispatch(
             loadSellerUser({
               shopUserData: result.data.user,
@@ -95,10 +94,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
           console.log(error);
         }
       },
-    })
+    }),
+    logoutShop: builder.mutation({
+      query: () => ({
+        url: "shop/logoutshop",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }) {
+        dispatch(logoutShop());
+      },
+    }),
   }),
 });
-
 export const {
   useRegisterMutation,
   useActivateAccountMutation,
@@ -106,5 +115,6 @@ export const {
   useLogoutUserMutation,
   useShopCreateApiMutation,
   useActivateShopMutation,
-  useLoginToShopMutation
+  useLoginToShopMutation,
+  useLogoutShopMutation,
 } = authApiSlice;

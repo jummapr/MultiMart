@@ -4,7 +4,10 @@ import asyncHandler from "../utils/asyncHandler";
 import User from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
 import uploadOnCloudinary from "../utils/cloudinary";
-import { createActivationToken, createActivationTokenForShop } from "../utils/generateActiveationLink";
+import {
+  createActivationToken,
+  createActivationTokenForShop,
+} from "../utils/generateActiveationLink";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
@@ -185,7 +188,6 @@ export const logoutUser = asyncHandler(
   }
 );
 
-
 // create shop
 
 export interface IShopCreate {
@@ -198,32 +200,39 @@ export interface IShopCreate {
   zipcode: number;
   avatar?: {
     public_id: string;
-    url: string
-  }
+    url: string;
+  };
 }
-
 
 // create shop
 
 export const createShop = asyncHandler(
-  async (req: Request,res:Response,next:NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const shopData: IShopCreate = req.body;
-    const {address,email,shopName,password,zipcode,description,phoneNumber} = shopData;
+    const {
+      address,
+      email,
+      shopName,
+      password,
+      zipcode,
+      description,
+      phoneNumber,
+    } = shopData;
 
-    const sellerEmail = await Shop.findOne({email})
+    const sellerEmail = await Shop.findOne({ email });
 
-    if(sellerEmail) {
-      const fileName = req.file.filename
-      await uploadOnCloudinary(fileName)
+    if (sellerEmail) {
+      const fileName = req.file.filename;
+      await uploadOnCloudinary(fileName);
 
       throw new ApiError(400, "User already exist.");
     }
 
     const fileName = req.file?.path;
-    console.log(fileName)
+    console.log(fileName);
 
     const uploadedOnCloudinary = await uploadOnCloudinary(fileName);
-    console.log("Cloudinary URl",uploadedOnCloudinary.url)
+    console.log("Cloudinary URl", uploadedOnCloudinary.url);
     const sellerData = {
       shopName,
       description,
@@ -238,7 +247,7 @@ export const createShop = asyncHandler(
       },
     };
 
-    console.log(sellerData)
+    console.log(sellerData);
 
     const activationToken = createActivationTokenForShop(sellerData);
     const activationUrl = `http://localhost:3000/seller/activation/${activationToken}`;
@@ -265,7 +274,10 @@ export const createShop = asyncHandler(
       return res
         .status(201)
         .json(
-          new ApiResponse(200, `Please check your email to verify your shop:- ${sellerData.email}`)
+          new ApiResponse(
+            200,
+            `Please check your email to verify your shop:- ${sellerData.email}`
+          )
         );
     } catch (error) {
       console.log(error);
@@ -274,8 +286,7 @@ export const createShop = asyncHandler(
   }
 );
 
-
-// active shop 
+// active shop
 
 export const activateShop = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -291,8 +302,17 @@ export const activateShop = asyncHandler(
       throw new ApiError(400, "Invalid token");
     }
 
-    const {address,email,shopName,password,zipcode,description,phoneNumber,avatar} = newUser as IShopCreate;
-    console.log(avatar)
+    const {
+      address,
+      email,
+      shopName,
+      password,
+      zipcode,
+      description,
+      phoneNumber,
+      avatar,
+    } = newUser as IShopCreate;
+    console.log(avatar);
     console.log("destructure the data");
 
     let seller = await Shop.findOne({ email });
@@ -309,13 +329,12 @@ export const activateShop = asyncHandler(
       address,
       zipcode,
       password,
-      avatar
+      avatar,
     });
 
     sendShopToken(seller, 201, res, "user shop activated successfully");
   }
 );
-
 
 // Login to shop
 
@@ -341,12 +360,11 @@ export const LoginToShop = asyncHandler(
 
     sendShopToken(user, 201, res, "user login to shop successfully.");
   }
-)
-
+);
 
 export const loadSellerUser = asyncHandler(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
-    console.log(req.user)
+    console.log(req.user);
     const { id } = req.user;
     const user = await Shop.findById(id);
 
@@ -355,5 +373,19 @@ export const loadSellerUser = asyncHandler(
     }
 
     res.status(200).json(new ApiResponse(200, "Seller fetched.", user));
+  }
+);
+
+// shop logout
+export const shopLogout = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.cookie("seller_token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Successfully logged out.", null));
   }
 );

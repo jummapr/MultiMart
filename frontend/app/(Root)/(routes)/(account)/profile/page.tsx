@@ -101,6 +101,7 @@ const ProfilePage = () => {
                     <FormItem className="w-full">
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
+                        {/* @ts-ignore */}
                         <Input
                           placeholder="Phone Number"
                           {...field}
@@ -118,6 +119,7 @@ const ProfilePage = () => {
                     <FormItem className="w-full">
                       <FormLabel>Zip Code</FormLabel>
                       <FormControl>
+                        {/* @ts-ignore */}
                         <Input
                           placeholder="Zip Code"
                           {...field}

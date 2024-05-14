@@ -25,6 +25,7 @@ import {
   Search,
   ShoppingBag,
   ShoppingCart,
+  Store,
   User,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,20 +60,30 @@ import {
   CommandList,
 } from "./ui/command";
 import { usePathname } from "next/navigation";
-import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
+import {
+  useLogoutShopMutation,
+  useLogoutUserMutation,
+} from "@/redux/features/auth/authApi";
 import { useToast } from "./ui/use-toast";
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setOpen] = useState(false);
   const { user, isAuthenticated } = useSelector((state: any) => state.loadUser);
+  const { isSeller, seller } = useSelector((state: any) => state.seller);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState<any>(null);
+  console.log("seller", seller);
 
-  const [logoutUser, { isLoading: isLogoutLoading,isSuccess,data }] = useLogoutUserMutation();
+  const [logoutUser, { isLoading: isLogoutLoading, isSuccess, data }] =
+    useLogoutUserMutation();
+  const [
+    logoutShop,
+    { isLoading: isShopLogoutLoadingSuccess, isSuccess: isLogoutSuccess },
+  ] = useLogoutShopMutation();
 
-    const { toast } = useToast();
-    console.log(data)
+  const { toast } = useToast();
+  console.log(data);
 
   const handleSearchChange = (e: any) => {
     const term = e.target.value;
@@ -88,9 +99,14 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-      await logoutUser(); 
-      toast({ title: "User logged out successfully"});
-      redirect("/login")
+    await logoutUser();
+    toast({ title: "User logged out successfully" });
+    redirect("/login");
+  };
+
+  const handleShopLogout = async () => {
+    await logoutShop();
+    redirect("/shop-login");
   };
 
   return (
@@ -148,7 +164,36 @@ const Navbar = () => {
             </div>
           </div>
           <div>
-            {isAuthenticated ? (
+            {isSeller && (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={seller?.data.avatar?.url} />
+                    <AvatarFallback>JR</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48">
+                  <DropdownMenuLabel>My Shop</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <Link href={`/shop/${seller?.data?._id}`}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Store className="mr-2 w-4 h-4" />
+                        <span>My Shop</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer"
+                    >
+                      <LogOut className="mr-2 w-4 h-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {isAuthenticated && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
@@ -200,18 +245,22 @@ const Navbar = () => {
                         <span>Address</span>
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer"
+                    >
                       <LogOut className="mr-2 w-4 h-4" />
                       <span>Logout</span>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
+            )}
+            {!isSeller && !isAuthenticated ? (
               <Link href="/login">
                 <Button className="px-6">Login</Button>
               </Link>
-            )}
+            ) : null}
           </div>
           <Link href={"/shop-create"} className={buttonVariants()}>
             Become seller
@@ -294,7 +343,10 @@ const Navbar = () => {
                               <BookUser className="mr-2 w-4 h-4" />
                               <span>Address</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem  onClick={handleLogout} className="cursor-pointer">
+                            <DropdownMenuItem
+                              onClick={handleLogout}
+                              className="cursor-pointer"
+                            >
                               <LogOut className="mr-2 w-4 h-4" />
                               <span>Logout</span>
                             </DropdownMenuItem>
