@@ -64,9 +64,9 @@ function SideNav() {
       href: "/shop/transaction",
     },
     {
-      label: "Discount Codes",
+      label: "Discount Coupon",
       icon: Gift,
-      href: "/shop/transaction",
+      href: "/shop/create-coupon",
     },
     {
       label: "Refunds",

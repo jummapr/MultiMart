@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import PreViewModal from "../modal/preview-product";
+import CouponCodeModel from "../modal/coupon-code";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -11,11 +12,12 @@ export const ModalProvider = () => {
     setIsMounted(true);
   }, []);
 
-  if(!isMounted) return null;
+  if (!isMounted) return null;
 
   return (
     <>
-        <PreViewModal />
+      <PreViewModal />
+      <CouponCodeModel />
     </>
-  )
+  );
 };

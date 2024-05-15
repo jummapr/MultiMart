@@ -8,7 +8,8 @@ export interface ICoupon extends Document {
   value: number;
   minAmount: number;
   maxAmount: number;
-  shop: object;
+  shopId: string;
+  selectedProducts: string;
 }
 
 const productSchema: Schema<ICoupon> = new mongoose.Schema(
@@ -28,9 +29,12 @@ const productSchema: Schema<ICoupon> = new mongoose.Schema(
     maxAmount: {
       type: Number,
     },
-    shop: {
-      type: Object,
+    shopId: {
+      type: String,
       required: true,
+    },
+    selectedProducts: {
+      type: String,
     },
   },
   { timestamps: true }

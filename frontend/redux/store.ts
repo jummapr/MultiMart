@@ -7,6 +7,8 @@ import productDetailModal from "./features/modal/productDetailSlice";
 import sellerSlice from "./features/auth/sellerSlice";
 import productSlice from "./features/product/productSlice";
 import eventSlice from "./features/event/eventSlice";
+import couponCodeModal from "./features/modal/couponCode";
+import couponSlice from "./features/coupon/couponSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
     seller: sellerSlice.reducer,
     product: productSlice.reducer,
     event: eventSlice.reducer,
+    couponModel: couponCodeModal.reducer,
+    coupon: couponSlice.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

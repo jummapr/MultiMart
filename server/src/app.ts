@@ -32,10 +32,12 @@ import userRoute from "./routes/user.route";
 import shopRoute from "./routes/shop.route";
 import productRoute from "./routes/product.route";
 import eventRoute from "./routes/event.route";
+import couponRoute from "./routes/coupoun.route";
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/shop", shopRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/event", eventRoute);
+app.use("/api/v1/coupon", couponRoute);
 
 export default app;

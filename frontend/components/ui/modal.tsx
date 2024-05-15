@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "./scroll-area";
+import { cn } from "@/lib/utils";
 
 interface ModalProps {
   title?: string;
@@ -16,6 +17,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
+  className: string;
 }
 
 const Modal = ({
@@ -24,6 +26,7 @@ const Modal = ({
   onClose,
   title,
   children,
+  className,
 }: ModalProps) => {
   const onChange = (open: boolean) => {
     if (!open) {
@@ -33,12 +36,12 @@ const Modal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent className=" overflow-x-auto max-w-[50rem]">
+      <DialogContent className={cn("overflow-x-auto", className)}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-          <div>{children}</div>
+        <div>{children}</div>
       </DialogContent>
     </Dialog>
   );
