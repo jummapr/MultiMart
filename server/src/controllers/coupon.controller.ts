@@ -8,7 +8,8 @@ import CouponCode from "../models/coupon.model";
 
 export const createCouponCode = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, value, minAmount, maxAmount, shop } = req.body;
+    const { name, value, minAmount, maxAmount, shopId, selectedProducts } =
+      req.body;
 
     const isCouponCodeExist = await CouponCode.find({ name });
 
@@ -16,7 +17,7 @@ export const createCouponCode = asyncHandler(
       throw new ApiError(400, "Coupon code already exist.");
     }
 
-    if (!name || !value || !minAmount || !maxAmount || !shop) {
+    if (!name || !value || !shopId) {
       throw new ApiError(400, "All field required.");
     }
 
@@ -25,7 +26,8 @@ export const createCouponCode = asyncHandler(
       value,
       minAmount,
       maxAmount,
-      shop,
+      shopId,
+      selectedProducts,
     });
 
     res
@@ -56,7 +58,7 @@ export const getCoupon = asyncHandler(
 
     res
       .status(201)
-      .json(new ApiResponse(200, "Product fetched successfully.", coupon));
+      .json(new ApiResponse(200, "coupon fetched successfully.", coupon));
   }
 );
 
@@ -69,7 +71,7 @@ export const deleteCoupon = asyncHandler(
       throw new ApiError(400, "Coupon is required.");
     }
 
-    const coupon = await CouponCode.find({ _id: id });
+    const coupon = await CouponCode.findByIdAndDelete({ _id: id });
 
     if (!coupon) {
       throw new ApiError(

@@ -25,9 +25,9 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    allProduct: builder.mutation({
+    getAllCoupon: builder.mutation({
       query: (data: any) => ({
-        url: `product/get-all-product/${data}`,
+        url: `coupon/get-all-coupon/${data}`,
         method: "GET",
         credentials: "include" as const,
       }),
@@ -46,9 +46,9 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
-    deleteProduct: builder.mutation({
+    deleteCoupon: builder.mutation({
       query: (data: any) => ({
-        url: `product/delete-product/${data}`,
+        url: `coupon/delete-coupon/${data}`,
         method: "DELETE",
         credentials: "include" as const,
       }),
@@ -58,6 +58,6 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useCreateNewCouponMutation,
-  useAllProductMutation,
-  useDeleteProductMutation,
+  useGetAllCouponMutation,
+  useDeleteCouponMutation,
 } = ProductApiSlice;

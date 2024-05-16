@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect } from "react";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { onOpen } from "@/redux/features/modal/couponCode";
@@ -22,10 +22,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  useDeleteCouponMutation,
+  useGetAllCouponMutation,
+} from "@/redux/features/coupon/couponApi";
 
 const CreateCoupon = () => {
   const { isOpen } = useSelector((state: any) => state.couponModel);
   const { allCoupon } = useSelector((state: any) => state.coupon);
+  const { createCoupon } = useSelector((state: any) => state.coupon);
+  const { seller } = useSelector((state: any) => state.seller);
+
+  const [getAllCoupon, { isError, data, error, isSuccess, isLoading }] =
+    useGetAllCouponMutation();
+
+  const [
+    deleteCoupon,
+    {
+      isError: isDeleteError,
+      error: deleteCouponError,
+      isSuccess: isDeleteSuccess,
+      isLoading: isDeleteLoading,
+    },
+  ] = useDeleteCouponMutation();
+
+  const id = seller?.data?._id;
+
   const dispatch = useDispatch();
   console.log(allCoupon);
 
@@ -35,9 +57,18 @@ const CreateCoupon = () => {
     dispatch(onOpen());
   };
 
-  const deleteCouponDiscount = (id: string) => {
-    console.log(id);
+  const fetchAllCoupon = async (id: string) => {
+    await getAllCoupon(id);
   };
+
+  const deleteCouponDiscount = async (id: string) => {
+    await deleteCoupon(id);
+  };
+
+  useEffect(() => {
+    fetchAllCoupon(id);
+  }, [seller, createCoupon, isDeleteSuccess]);
+
   return (
     <div className="h-full w-full flex items-center flex-col gap-10">
       <div className="w-full px-12 flex justify-end  pt-20">
@@ -93,7 +124,7 @@ const CreateCoupon = () => {
                             <DropdownMenuItem>Edit</DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onClick={() => deleteCouponDiscount("Id")}
+                              onClick={() => deleteCouponDiscount(item._id)}
                             >
                               Delete
                             </DropdownMenuItem>

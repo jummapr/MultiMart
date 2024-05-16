@@ -81,12 +81,13 @@ const CouponCodeModel = () => {
       minAmount: Number(values.minAmount),
       maxAmount: Number(values.maxAmount),
       selectedProducts: values.selectedProducts,
-      shop: seller.data,
+      shopId: seller?.data?._id,
     };
     await createNewCoupon(couponData);
 
     CouponCodeForm.reset();
     console.log(values);
+    onCloseModal();
   }
 
   useEffect(() => {
