@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useAllProductMutation,
   useDeleteProductMutation,
 } from "@/redux/features/product/productApi";
 import React, { useEffect, useState } from "react";
@@ -25,21 +24,14 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { useAllSellerProductMutation } from "@/redux/features/shop/shopApi";
 
 const AllProduct = () => {
   const [open, setOpen] = useState(false);
   const { seller } = useSelector((state: any) => state.seller);
-  const productData = useSelector((state: any) => state.product);
-  const [allProduct, { isError, data, error, isSuccess, isLoading }] =
-    useAllProductMutation();
+  const productData = useSelector((state: any) => state.shop);
+  const [allSellerProduct, { isError, data, error, isSuccess, isLoading }] =
+  useAllSellerProductMutation();
 
   const [
     deleteProduct,
@@ -51,9 +43,10 @@ const AllProduct = () => {
   ] = useDeleteProductMutation();
 
   const id = seller?.data?._id;
+  console.log("Shop Id ", id)
 
   const getAllProduct = async () => {
-    await allProduct(id);
+    await allSellerProduct(id);
   };
 
   const DeleteProduct = (id: string) => {
@@ -66,7 +59,7 @@ const AllProduct = () => {
 
   useEffect(() => {
     getAllProduct();
-  }, [deleteProductIsSuccess]);
+  }, [deleteProductIsSuccess,seller]);
 
   return (
     <div className="w-full h-full px-10 flex justify-center py-20">

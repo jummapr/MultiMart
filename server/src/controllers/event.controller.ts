@@ -78,9 +78,9 @@ export const createEvent = asyncHandler(
   }
 );
 
-// get all product from shop
+// get all events
 
-export const getAllEvents = asyncHandler(
+export const getAllEventsFromShop = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const shopId = req.params.shopId;
 
@@ -132,3 +132,22 @@ export const deleteEvent = asyncHandler(
       .json(new ApiResponse(200, "Event deleted successfully.", event));
   }
 );
+
+
+// get all events
+export const getAllEvents = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const events = await Event.find();
+
+    if (!events) {
+      throw new ApiError(
+        404,
+        "Event not found."
+      );
+    }
+
+    res
+      .status(201)
+      .json(new ApiResponse(200, "Event fetched successfully.", events));
+  }
+)

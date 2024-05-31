@@ -73,6 +73,7 @@ const Navbar = () => {
   const { isSeller, seller } = useSelector((state: any) => state.seller);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState<any>(null);
+  const { allProduct: products } = useSelector((state: any) => state.product);
   console.log("seller", seller);
 
   const [logoutUser, { isLoading: isLogoutLoading, isSuccess, data }] =
@@ -90,8 +91,8 @@ const Navbar = () => {
     setSearchTerm(term);
 
     const filterProducts =
-      productData &&
-      productData.filter((product) =>
+    products &&
+    products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
@@ -128,14 +129,14 @@ const Navbar = () => {
           {searchData && searchData.length !== 0 ? (
             // <ScrollArea>
 
-            <div className="absolute max-h-96 bg-[#F5F5F5] shadow-sm-2 overflow-y-auto rounded-sm z-[9] p-4">
+            <div className="absolute w-full max-h-96 bg-[#F5F5F5] shadow-sm-2 overflow-y-auto rounded-sm z-[9] p-4">
               {searchData &&
                 searchData.map((i: any, index: any): any => {
                   return (
                     <Link href={`/product/${i._id}`} className="">
                       <div className="w-full py-3 px-4 flex hover:bg-gray-200 rounded-sm">
                         <Image
-                          src={`${i.image_Url[0]?.url}`}
+                          src={`${i.images[0]?.url}`}
                           alt=""
                           width={40}
                           height={40}

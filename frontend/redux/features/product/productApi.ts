@@ -28,7 +28,7 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
     }),
     allProduct: builder.mutation({
       query: (data: any) => ({
-        url: `product/get-all-product/${data}`,
+        url: `product/get-all-product`,
         method: "GET",
         credentials: "include" as const,
       }),

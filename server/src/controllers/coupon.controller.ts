@@ -106,6 +106,18 @@ export const getCouponByName = asyncHandler(
 
     res
       .status(201)
-      .json(new ApiResponse(200, "coupon deleted successfully.", coupon));
+      .json(new ApiResponse(200, "Coupon retrieved successfully.", coupon));
   }
 );
+
+export const getCouponDetail = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ID = req.params.id;
+
+    const coupon = await CouponCode.find({_id: ID})
+
+    res
+      .status(201)
+      .json(new ApiResponse(200, "Coupon retrieved successfully.", coupon));
+  }
+)

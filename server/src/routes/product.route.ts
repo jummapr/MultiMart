@@ -10,7 +10,7 @@ import { isSeller } from "../middlewares/auth.middlewares";
 const router = express.Router();
 
 router.route("/create-product").post(upload.array("files"), createProduct);
-router.route("/get-all-product/:shopId").get(isSeller, getAllProduct);
+router.route("/get-all-product").get(getAllProduct);
 router.route("/delete-product/:id").delete(isSeller, deleteProductProduct);
 
 export default router;

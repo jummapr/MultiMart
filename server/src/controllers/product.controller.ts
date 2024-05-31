@@ -77,13 +77,8 @@ export const createProduct = asyncHandler(
 // get all product from shop
 export const getAllProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const shopId = req.params.shopId;
 
-    if (!shopId) {
-      throw new ApiError(400, "Shop ID is required.");
-    }
-
-    const product = await Product.find({ shopId });
+    const product = await Product.find();
 
     if (!product) {
       throw new ApiError(
@@ -124,5 +119,59 @@ export const deleteProductProduct = asyncHandler(
     res
       .status(200)
       .json(new ApiResponse(200, "Product deleted successfully.", product));
+  }
+);
+
+// get all product from shop
+export const getAllProductFromShop = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ProductId = req.params.id;
+    if (!ProductId) {
+      throw new ApiError(400, "Product ID is required.");
+    }
+
+    const product = await Product.find({ shopId: ProductId });
+
+    if (!product) {
+      throw new ApiError(404, "Product not found.");
+    }
+
+    res.status(200).json(new ApiResponse(200, "", product));
+  }
+);
+
+// get all product
+
+export const getAllProducts = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const products = await Product.find().sort({ createdAt: -1 });
+
+    if (!products) {
+      throw new ApiError(404, "Products not found.");
+    }
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Products fetched successfully!", products));
+  }
+);
+
+// get shop info
+
+export const getShopInfo = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const shopId = req.params.id;
+
+    if(!shopId) {
+      throw new ApiError(400,"Shop Id is required.");
+    }
+
+    const shop = await Shop.findById({ _id: shopId });
+
+    if (!shop) {
+      throw new ApiError(404, "Shop not found.");
+    }
+
+    res.status(200).json(new ApiResponse(200,"Shop Info fetched successfully!",shop))
   }
 );

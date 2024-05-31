@@ -60,7 +60,7 @@ const CouponCodeModel = () => {
   const id = seller?.data?._id;
 
   const getAllProduct = async () => {
-    await allProduct(id);
+    await allProduct();
   };
 
   const CouponCodeForm = useForm<z.infer<typeof couponCodeSchema>>({

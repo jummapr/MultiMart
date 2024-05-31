@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  useAllProductMutation,
-  useDeleteProductMutation,
-} from "@/redux/features/product/productApi";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -25,14 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   useDeleteEventMutation,
   useGetallEventsMutation,

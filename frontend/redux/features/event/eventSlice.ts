@@ -3,6 +3,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 const initialState = {
   createEvent: {},
   allEvents: [],
+  eventsForUser: []
 };
 
 const eventSlice = createSlice({
@@ -15,8 +16,11 @@ const eventSlice = createSlice({
     getAllEvents: (state, action: PayloadAction<{ event: any }>) => {
       state.allEvents = action.payload.event;
     },
+    getAllEventsForUser: (state, action: PayloadAction<{ event: any }>) => {
+      state.eventsForUser = action.payload.event;
+    },
   },
 });
 
-export const { createNewEvent, getAllEvents } = eventSlice.actions;
+export const { createNewEvent, getAllEvents, getAllEventsForUser } = eventSlice.actions;
 export default eventSlice;

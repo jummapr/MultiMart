@@ -103,7 +103,7 @@ const CreateCoupon = () => {
                   allCoupon.map((item: any) => (
                     <TableRow>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.value}</TableCell>
+                      <TableCell>{item.value}%</TableCell>
                       <TableCell>{item.minAmount}</TableCell>
                       <TableCell>{item.maxAmount}</TableCell>
                       <TableCell>{item.selectedProducts}</TableCell>

@@ -1,10 +1,78 @@
+"use client"
+
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useGetEventsByUserMutation } from "@/redux/features/event/eventApi";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import EventCard from "./EventCard";
 
 const BestDeal = () => {
+  const {eventsForUser} = useSelector((state: any) => state.event)
+  const [getEventsByUser, { isError, data, error, isSuccess, isLoading }] =
+  useGetEventsByUserMutation();
+  const [counter, setCounter] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  const bestDealData = {
+    name: eventsForUser[1]?.name,
+    description: eventsForUser[1]?.description,
+    image: eventsForUser[1]?.images[0].url,
+    originalPrice: eventsForUser[1]?.originalPrice,
+    discountPrice: eventsForUser[1]?.discountPrice,
+    start_date: eventsForUser[1]?.start_date,
+    finish_date: eventsForUser[1]?.finish_date,
+  };
+
+
+  const fetchedEvent = async() => {
+    // @ts-ignore
+    await getEventsByUser();
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const startDate = new Date(bestDealData.start_date);
+      const finishDate = new Date(bestDealData.finish_date);
+      const currentDate = new Date();
+
+      if (currentDate >= startDate && currentDate <= finishDate) {
+        // @ts-ignore
+        const distance = finishDate - currentDate;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor(
+          (distance % (1000 * 60 * 60)) / (1000 * 60)
+        );
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        setCounter({ days, hours, minutes, seconds });
+      } else {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [bestDealData.start_date, bestDealData.finish_date]);
+
+  console.log("Counter for best deal",counter)
+
+  useEffect(() => {
+      fetchedEvent();
+  },[])
+
+
   return (
     <div>
       <div className="w-full flex justify-between items-center pb-10">
@@ -13,49 +81,7 @@ const BestDeal = () => {
           View All
         </Link>
       </div>
-      <div className="flex justify-between w-full rounded-lg bg-primaryBlack my-5 px-14 py-8">
-        <div className="flex flex-col justify-center items-start gap-2">
-          <h2 className="text-4xl font-semibold text-white">
-            IPhone 14Pro max
-          </h2>
-          <p className="text-white text-sm w-[22rem] pt-3">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit ex
-            quasi fuga ea, quam animi id cum? Ipsam sint neque ab amet, tempore
-            accusamus ipsum nihil qui! Libero, repellendus eos!
-          </p>
-          <div className="flex flex-row gap-2">
-            <p className="text-white font-medium">$899</p>
-            <p className="text-[#DB4444] line-through">$1099</p>
-          </div>
-          <div className="flex flex-row gap-4 w-full pt-6">
-            <div className="flex justify-center items-center flex-col w-16 h-16 relative rounded-full bg-white">
-              <p className="text-primaryBlack text-xs font-semibold">23</p>
-              <p className="text-primaryBlack text-xs font-medium">Hours</p>
-            </div>
-            <div className="flex justify-center items-center flex-col w-16 h-16 relative rounded-full bg-white">
-              <p className="text-primaryBlack text-xs font-semibold">23</p>
-              <p className="text-primaryBlack text-xs font-medium">Days</p>
-            </div>
-            <div className="flex justify-center items-center flex-col w-16 h-16 relative rounded-full bg-white">
-              <p className="text-primaryBlack text-xs font-semibold">23</p>
-              <p className="text-primaryBlack text-xs font-medium">Minutes</p>
-            </div>
-            <div className="flex justify-center items-center flex-col w-16 h-16 relative rounded-full bg-white">
-              <p className="text-primaryBlack text-xs font-semibold">23</p>
-              <p className="text-primaryBlack text-xs font-medium">Seconds</p>
-            </div>
-          </div>
-          <Button className="w-40 text-lg mt-10 h-14">Buy now</Button>
-        </div>
-        <div>
-          <Image
-            src="/product/iphoneimage.png"
-            alt="Shoes"
-            width={350}
-            height={350}
-          />
-        </div>
-      </div>
+      <EventCard data={bestDealData} counter={counter}/>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { createNewEvent, getAllEvents } from "./eventSlice";
+import { createNewEvent, getAllEvents, getAllEventsForUser } from "./eventSlice";
 
 export const ProductApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -47,6 +47,27 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    getEventsByUser: builder.mutation({
+      query: () => ({
+        url: `event/get-all-events`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          console.log(result.data);
+          dispatch(
+            getAllEventsForUser({
+              event: result.data.data,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
     deleteEvent: builder.mutation({
       query: (data: any) => ({
         url: `event/delete-event/${data}`,
@@ -61,4 +82,5 @@ export const {
   useCreateNewEventMutation,
   useGetallEventsMutation,
   useDeleteEventMutation,
+  useGetEventsByUserMutation,
 } = ProductApiSlice;
