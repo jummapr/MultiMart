@@ -54,6 +54,13 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    productDetail: builder.query({
+      query: (data: any) => ({
+        url: `product/product-detail/${data}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    })
   }),
 });
 
@@ -61,4 +68,5 @@ export const {
   useCreateNewProductMutation,
   useAllProductMutation,
   useDeleteProductMutation,
+  useProductDetailQuery,
 } = ProductApiSlice;

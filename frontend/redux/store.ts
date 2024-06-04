@@ -10,6 +10,8 @@ import eventSlice from "./features/event/eventSlice";
 import couponCodeModal from "./features/modal/couponCode";
 import couponSlice from "./features/coupon/couponSlice";
 import shopSlice from "./features/shop/shopSlice";
+import cartSlice from "./features/cart/cartSlice";
+import wishListSlice from "./features/wishlist/wishlistSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +24,8 @@ export const store = configureStore({
     couponModel: couponCodeModal.reducer,
     coupon: couponSlice.reducer,
     shop: shopSlice.reducer,
+    cart: cartSlice.reducer,
+    wishlist: wishListSlice.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

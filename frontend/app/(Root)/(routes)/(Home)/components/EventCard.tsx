@@ -13,7 +13,6 @@ interface EventCardInterface {
 }
 
 const EventCard = ({data,counter}: any) => {
-    console.log("Best Deal Data",data)
   return (
     <div className="flex justify-between w-full rounded-lg bg-primaryBlack my-5 px-14 py-8">
       <div className="flex flex-col justify-center items-start gap-2">

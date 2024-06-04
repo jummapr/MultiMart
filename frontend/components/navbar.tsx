@@ -69,12 +69,13 @@ import { redirect } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setOpen] = useState(false);
+  const {cart} = useSelector((state:any) => state.cart);
+  const {wishlist} = useSelector((state: any) => state.wishlist)
   const { user, isAuthenticated } = useSelector((state: any) => state.loadUser);
   const { isSeller, seller } = useSelector((state: any) => state.seller);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState<any>(null);
   const { allProduct: products } = useSelector((state: any) => state.product);
-  console.log("seller", seller);
 
   const [logoutUser, { isLoading: isLogoutLoading, isSuccess, data }] =
     useLogoutUserMutation();
@@ -91,8 +92,8 @@ const Navbar = () => {
     setSearchTerm(term);
 
     const filterProducts =
-    products &&
-    products.filter((product) =>
+      products &&
+      products.filter((product: any) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
@@ -114,9 +115,11 @@ const Navbar = () => {
     <div>
       <div className="hidden md:flex md:justify-between items-center px-28 w-full h-16 border border-b">
         <div className="flex flex-row">
-          <h2 className="text-primaryBlack font-semibold text-2xl">
-            Exclusive
-          </h2>
+          <Link href={"/"}>
+            <h2 className="text-primaryBlack font-semibold text-2xl">
+              Exclusive
+            </h2>
+          </Link>
         </div>
         <div className="relative">
           <Input
@@ -152,18 +155,22 @@ const Navbar = () => {
           null}
         </div>
         <div className="flex flex-row items-center space-x-4">
-          <div className="relative">
-            <Heart className="w-7 h-7" />
-            <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
-              10
+          <Link href={"/wishlist"}>
+            <div className="relative">
+              <Heart className="w-7 h-7" />
+              <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
+                {wishlist?.length}
+              </div>
             </div>
-          </div>
-          <div className="relative">
-            <ShoppingCart className="w-7 h-7" />
-            <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
-              10
+          </Link>
+          <Link href={"/cart"}>
+            <div className="relative">
+              <ShoppingCart className="w-7 h-7" />
+              <div className=" absolute -top-1 -right-1 text-[10px] rounded-full text-center  bg-black text-white w-4 h-4">
+                {cart?.length}
+              </div>
             </div>
-          </div>
+          </Link>
           <div>
             {isSeller && (
               <DropdownMenu>

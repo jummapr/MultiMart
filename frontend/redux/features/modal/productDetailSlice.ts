@@ -3,10 +3,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface IProductDetailModal {
     isOpen: boolean;
+    id: string
   }
 
 const initialState: IProductDetailModal = {
-    isOpen: false
+    isOpen: false,
+    id: ""
 }
 
 const productDetailModal = createSlice({
@@ -22,9 +24,12 @@ const productDetailModal = createSlice({
       onClose: (state) => {
         state.isOpen = false;
       },
+      getId: (state, action) => {
+        state.id = action.payload
+      }
     },
   });
 
-  export const { onOpen, onClose } = productDetailModal.actions;
+  export const { onOpen, onClose, getId } = productDetailModal.actions;
 
   export default productDetailModal

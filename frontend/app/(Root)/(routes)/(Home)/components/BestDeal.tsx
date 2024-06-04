@@ -66,7 +66,6 @@ const BestDeal = () => {
     };
   }, [bestDealData.start_date, bestDealData.finish_date]);
 
-  console.log("Counter for best deal",counter)
 
   useEffect(() => {
       fetchedEvent();

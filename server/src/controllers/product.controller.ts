@@ -175,3 +175,23 @@ export const getShopInfo = asyncHandler(
     res.status(200).json(new ApiResponse(200,"Shop Info fetched successfully!",shop))
   }
 );
+
+// get product detail by id
+
+export const getProductById = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const ProductId = req.params.id;
+     
+    if(!ProductId) {
+      throw new ApiError(400,"Product Id is required.");
+    }
+
+    const product = await Product.findById({ _id: ProductId });
+
+    if (!product) {
+      throw new ApiError(404, "Product not found.");
+    }
+
+    res.status(200).json(new ApiResponse(200,"Product fetched successfully!",product))
+  }
+);
