@@ -3,7 +3,7 @@ import ApiResponse from "../utils/ApiResponse";
 import asyncHandler from "../utils/asyncHandler";
 import User from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
-import uploadOnCloudinary from "../utils/cloudinary";
+import uploadOnCloudinary, { deleteTheOldPicture } from "../utils/cloudinary";
 import {
   createActivationToken,
   createActivationTokenForShop,
@@ -389,3 +389,70 @@ export const shopLogout = asyncHandler(
       .json(new ApiResponse(200, "Successfully logged out.", null));
   }
 );
+
+// update user informatuon
+export const updateUserInfo = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const { id } = req.user;
+
+    const {name,email, password, phoneNumber} = req.body;
+
+    const user = await User.findById(id).select("+password");
+
+    if(!user) {
+      throw new ApiError(400, "User doesn't exist.");
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if(!isMatch) {
+      throw new ApiError(400, "Invalid credentials");
+    }
+
+    user.name = name;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+
+    await user.save();
+
+    res.status(200).json(new ApiResponse(200, "User updated successfully.", user));
+
+  }
+);
+
+// update user avatar
+export const updateUserAvatar = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const { id } = req.user;
+
+    const user = await User.findById(id);
+
+    if(!user) {
+      throw new ApiError(400, "User doesn't exist.");
+    }
+
+    if(user?.avatar?.public_id) {
+      await deleteTheOldPicture(user.avatar.public_id);
+    }
+
+    const file = req.file;
+
+
+    if(!file) {
+      throw new ApiError(400, "Please upload a file.");
+    }
+
+    const uploadedOnCloudinary = await uploadOnCloudinary(file?.path);
+
+    if(!uploadOnCloudinary) {
+      throw new ApiError(400,  "avatar not uploaded!, please try again.")
+    }
+
+    user.avatar.public_id = uploadedOnCloudinary.public_id;
+    user.avatar.url = uploadedOnCloudinary.secure_url;
+
+    await user.save();
+
+    res.status(200).json(new ApiResponse(200, "User avatar updated successfully", user));
+  }
+) 

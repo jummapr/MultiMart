@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { logoutUser, useLoadUser } from "./authSlice";
+import { logoutUser, updateAvatar, updateUserInfo, useLoadUser } from "./authSlice";
 import { loadSellerUser, logoutShop } from "./sellerSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -84,7 +84,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
         try {
           const result = await queryFulfilled;
-          console.log("state data", result.data);
           dispatch(
             loadSellerUser({
               shopUserData: result.data.user,
@@ -95,6 +94,52 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    updateUserInfo: builder.mutation({
+      query: (data: any) => ({
+        url: "user/update-user-info",
+        method: "PUT",
+        body: data,
+        credentials: "include" as const,
+        formData: true,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            updateUserInfo({
+              user: result.data.data.user,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+
+    updateUserAvatar: builder.mutation({
+      query: (data: any) => ({
+        url: "user/update-avatar",
+        method: "PUT",
+        body: data,
+        credentials: "include" as const,
+        formData: true,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            updateAvatar({
+              user: result.data.data.user,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+
     logoutShop: builder.mutation({
       query: () => ({
         url: "shop/logoutshop",
@@ -117,4 +162,6 @@ export const {
   useActivateShopMutation,
   useLoginToShopMutation,
   useLogoutShopMutation,
+  useUpdateUserInfoMutation,
+  useUpdateUserAvatarMutation,
 } = authApiSlice;

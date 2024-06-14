@@ -30,7 +30,7 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
       required: [true, "Please enter your shop name"],
     },
     description: {
-        type: String
+      type: String,
     },
     email: {
       type: String,
@@ -44,19 +44,19 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      required: true
+      required: true,
     },
     address: {
       type: String,
-      required: true
-  },
+      required: true,
+    },
     role: {
       type: String,
       default: "seller",
     },
     zipcode: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     avatar: {
       public_id: {
@@ -67,7 +67,6 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
         type: String,
         required: true,
       },
-      
     },
     resetPasswordToken: String,
     resetPasswordTime: Date,
@@ -77,29 +76,27 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
 
 // Hash password
 shopSchema.pre<IShop>("save", async function (next) {
-    if (!this.isModified("password")) {
-      next();
-    }
-    this.password = await bcrypt.hash(this.password, 10);
+  if (!this.isModified("password")) {
     next();
-  });
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
-  // jwt token
-  shopSchema.methods.getJwtToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: process.env.JWT_EXPIRES,
-    });
-  };
+// jwt token
+shopSchema.methods.getJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+};
 
 // compare password
 
 shopSchema.methods.comparePassword = async function (
-    enteredPassword: string
-  ): Promise<boolean> {
-    return await bcrypt.compare(enteredPassword, this.password);
-  };
-
-
+  enteredPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const Shop: Model<IShop> = mongoose.model("Shop", shopSchema);
 

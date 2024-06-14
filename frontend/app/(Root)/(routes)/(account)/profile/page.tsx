@@ -6,7 +6,7 @@ import profileSchema from "@/schema/profileSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { z } from "zod";
 
 import {
@@ -20,27 +20,41 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import useAuthRedirect from "@/hooks/useAuthRedirect";
+import { useUpdateUserInfoMutation } from "@/redux/features/auth/authApi";
+import { onOpen } from "@/redux/features/modal/authModel";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 const ProfilePage = () => {
 
-  useAuthRedirect()
+  // useAuthRedirect()
 
+  const [ updateUserInfo,{isLoading} ] = useUpdateUserInfoMutation();
+  const dispatch  = useDispatch();
   const { user } = useSelector((state: any) => state.loadUser);
+
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name,
       email: user?.email,
-      phoneNumber: user?.phonenumber ? user?.phonenumber : null,
+      password: "",
+      phoneNumber: user?.phoneNumber ? user?.phoneNumber : Number(""),
       address1: user?.address1 ? user?.address1 : "",
       address2: user?.address2 ? user?.address : "",
       zipcode: user?.zipcode ? user?.zipcode : null,
     },
   });
 
-  const onProfileSubmit = (values: z.infer<typeof profileSchema>) => {
+  const onProfileSubmit = async(values: z.infer<typeof profileSchema>) => {
     console.log(values);
+    await updateUserInfo(values)
   };
+
+  const handleAuthModel = () => {
+    console.log("clicked")
+    dispatch(onOpen())
+  }
+
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
@@ -49,7 +63,7 @@ const ProfilePage = () => {
           <Avatar className="w-20 h-20">
             <AvatarImage src={user?.avatar?.url}></AvatarImage>
           </Avatar>
-          <Button variant={"ghost"}>Change Avatar</Button>
+          <Button variant={"ghost"} onClick={() => handleAuthModel()}>Change Avatar</Button>
         </div>
         <div className="w-full pt-5">
           <Form {...profileForm}>
@@ -103,6 +117,7 @@ const ProfilePage = () => {
                       <FormControl>
                         {/* @ts-ignore */}
                         <Input
+                        type="number"
                           placeholder="Phone Number"
                           {...field}
                           className="bg-accent rounded-sm border-none w-full"
@@ -114,14 +129,14 @@ const ProfilePage = () => {
                 />
                 <FormField
                   control={profileForm.control}
-                  name="zipcode"
+                  name="password"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Zip Code</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
                         {/* @ts-ignore */}
                         <Input
-                          placeholder="Zip Code"
+                          placeholder="Password"
                           {...field}
                           className="bg-accent rounded-sm border-none w-full"
                         />
@@ -131,7 +146,7 @@ const ProfilePage = () => {
                   )}
                 />
               </div>
-              <div className="flex px-8 flex-col lg:flex-row gap-5 items-center w-full">
+              {/* <div className="flex px-8 flex-col lg:flex-row gap-5 items-center w-full">
                 <FormField
                   control={profileForm.control}
                   name="address1"
@@ -166,9 +181,9 @@ const ProfilePage = () => {
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
               <div className="w-full flex items-center justify-center">
-                <Button type="submit">Update</Button>
+                <Button type="submit" disabled={isLoading}>Update</Button>
               </div>
             </form>
           </Form>

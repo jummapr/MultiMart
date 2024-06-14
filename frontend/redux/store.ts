@@ -12,6 +12,7 @@ import couponSlice from "./features/coupon/couponSlice";
 import shopSlice from "./features/shop/shopSlice";
 import cartSlice from "./features/cart/cartSlice";
 import wishListSlice from "./features/wishlist/wishlistSlice";
+import authModel from "./features/modal/authModel";
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,8 @@ export const store = configureStore({
     shop: shopSlice.reducer,
     cart: cartSlice.reducer,
     wishlist: wishListSlice.reducer,
+
+    [authModel.reducerPath]:  authModel.reducer
   },
 
   middleware: (getDefaultMiddleware) =>

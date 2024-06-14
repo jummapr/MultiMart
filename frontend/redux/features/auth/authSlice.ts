@@ -20,8 +20,14 @@ const authSlice = createSlice({
             state.user = null
             state.isAuthenticated = false
         },
+        updateUserInfo: (state,action) => {
+            state.user = action.payload
+        },
+        updateAvatar: (state,action) => {
+            state.user = action.payload
+        }
     }
 })
 
-export const {useLoadUser,logoutUser} = authSlice.actions
+export const {useLoadUser,logoutUser,updateUserInfo, updateAvatar} = authSlice.actions
 export default authSlice
