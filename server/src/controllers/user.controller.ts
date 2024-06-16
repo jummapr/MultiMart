@@ -456,3 +456,70 @@ export const updateUserAvatar = asyncHandler(
     res.status(200).json(new ApiResponse(200, "User avatar updated successfully", user));
   }
 ) 
+
+// Update the user address
+export const updateUserAddress = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const { id } = req.user;
+
+    const {country, state, city,zipCode,address1,address2,addresstype} = req.body
+    
+    const user = await User.findById(id);
+
+    if(!user) {
+      throw new ApiError(400, "User doesn't exist.");
+    }
+
+    const isAddressExist = user.address.find((address) => address.addresstype === addresstype)
+
+    if(isAddressExist) {
+      throw new ApiError(400, "address already exist")
+    }
+
+    const newAddress = {
+      country,
+      state,
+      city,
+      zipCode,
+      address1,
+      address2,
+      addresstype
+    };
+
+    user.address.push(newAddress);
+
+    await user.save();
+
+    res.status(200).json(new ApiResponse(200, "Address added successfully.", user));
+  }
+);
+
+export const deleteUserAddress = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const { id } = req.user;
+
+    const {addresstype} = req.body
+    
+    const user = await User.findById(id);
+
+    if(!user) {
+      throw new ApiError(400, "User doesn't exist.");
+    }
+
+    // NOTE: what's the use of findIndex method?
+    const addressIndex = user.address.findIndex((address) => address.addresstype === addresstype);
+
+    console.log("Address Index", addressIndex)
+
+    if (addressIndex === -1) {
+      throw new ApiError(400, "Address not found.");
+    }
+
+    // NOTE: what's the use of splice method? is it efficient and good way to delete it?
+    user.address.splice(addressIndex, 1);
+
+    await user.save();
+
+    res.status(200).json(new ApiResponse(200, "Address deleted successfully.", user));
+  }
+)

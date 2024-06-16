@@ -13,6 +13,7 @@ import shopSlice from "./features/shop/shopSlice";
 import cartSlice from "./features/cart/cartSlice";
 import wishListSlice from "./features/wishlist/wishlistSlice";
 import authModel from "./features/modal/authModel";
+import addressModel from "./features/modal/addressModel";
 
 export const store = configureStore({
   reducer: {
@@ -28,7 +29,8 @@ export const store = configureStore({
     cart: cartSlice.reducer,
     wishlist: wishListSlice.reducer,
 
-    [authModel.reducerPath]:  authModel.reducer
+    [authModel.reducerPath]:  authModel.reducer,
+    [addressModel.reducerPath]:  addressModel.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
