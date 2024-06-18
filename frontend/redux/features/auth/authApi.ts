@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { logoutUser, updateAvatar, updateUserInfo, useLoadUser } from "./authSlice";
+import { deleteAddress, logoutUser, updateAddress, updateAvatar, updateUserInfo, useLoadUser } from "./authSlice";
 import { loadSellerUser, logoutShop } from "./sellerSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -140,6 +140,51 @@ export const authApiSlice = apiSlice.injectEndpoints({
       },
     }),
 
+    updateUserAddress: builder.mutation({
+      query: (data: any) => ({
+        url: "user/update-user-address",
+        method: "PUT",
+        body: data,
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          console.log(result.data);
+          dispatch(
+            updateAddress({
+              user: result.data.data,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+
+    deleteUserAddress: builder.mutation({
+      query: (data: any) => ({
+        url: `user/delete-user-address/${data}`,
+        method: "DELETE",
+        body: data,
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            deleteAddress({
+              user: result.data.data.user,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+
     logoutShop: builder.mutation({
       query: () => ({
         url: "shop/logoutshop",
@@ -164,4 +209,6 @@ export const {
   useLogoutShopMutation,
   useUpdateUserInfoMutation,
   useUpdateUserAvatarMutation,
+  useUpdateUserAddressMutation,
+  useDeleteUserAddressMutation
 } = authApiSlice;

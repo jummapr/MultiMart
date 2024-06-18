@@ -498,8 +498,8 @@ export const deleteUserAddress = asyncHandler(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
     const { id } = req.user;
 
-    const {addresstype} = req.body
-    
+    const addresstype: any = req.params.addresstype;
+    console.log(addresstype)
     const user = await User.findById(id);
 
     if(!user) {
@@ -522,4 +522,4 @@ export const deleteUserAddress = asyncHandler(
 
     res.status(200).json(new ApiResponse(200, "Address deleted successfully.", user));
   }
-)
+);

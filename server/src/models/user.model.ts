@@ -69,7 +69,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
         zipCode: {
           type: Number,
         },
-        addressType: {
+        addresstype: {
           type: String,
         },
       },

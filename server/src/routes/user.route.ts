@@ -1,9 +1,11 @@
 import {
   activateUser,
+  deleteUserAddress,
   loadUser,
   loginUser,
   logoutUser,
   registerUser,
+  updateUserAddress,
   updateUserAvatar,
   updateUserInfo,
 } from "../controllers/user.controller";
@@ -22,5 +24,7 @@ router.route("/update-user-info").put(isAuthenticated, updateUserInfo);
 router
   .route("/update-avatar")
   .put(isAuthenticated, upload.single("file"), updateUserAvatar);
+router.route("/update-user-address").put(isAuthenticated, updateUserAddress);
+router.route("/delete-user-address/:addresstype").delete(isAuthenticated, deleteUserAddress);
 
 export default router;

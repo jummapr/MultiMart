@@ -19,7 +19,10 @@ import { useToast } from "../ui/use-toast";
 import Modal from "../ui/modal";
 import { onClose } from "@/redux/features/modal/addressModel";
 import addressSchema from "@/schema/addressSchema";
-import { useUpdateUserAvatarMutation } from "@/redux/features/auth/authApi";
+import {
+  useUpdateUserAddressMutation,
+  useUpdateUserAvatarMutation,
+} from "@/redux/features/auth/authApi";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import {
@@ -32,6 +35,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { ClipboardType } from "lucide-react";
+import { getCountryByCode, getStateByCode } from "@/lib/utils";
 
 interface AddressDataType {
   name: string;
@@ -40,6 +44,9 @@ interface AddressDataType {
 const AddressModel = () => {
   const { isOpen } = useSelector((state: any) => state.addressModel);
   const [avatar, setAvatar] = useState(null);
+
+  const [updateUserAddress, { isLoading }] = useUpdateUserAddressMutation();
+
   const { toast } = useToast();
   const dispatch = useDispatch();
   const [country, setCountry] = useState("");
@@ -81,7 +88,22 @@ const AddressModel = () => {
     dispatch(onClose());
   };
 
-  function handleAddress(values: z.infer<typeof addressSchema>) {
+  async function handleAddress(values: z.infer<typeof addressSchema>) {
+    const countryByCode = getCountryByCode(values.country);
+    const stateByCode = getStateByCode(values.state, values.country);
+
+    const addressData = {
+      country: countryByCode?.name,
+      state: stateByCode?.name,
+      city: values.city,
+      zipCode: values.zipCode,
+      address1: values.address1,
+      address2: values.address2,
+      addresstype: values.addresstype,
+    }
+
+    await updateUserAddress(addressData);
+    onCloseModal();
     console.log(values);
   }
 
@@ -106,6 +128,7 @@ const AddressModel = () => {
     setAddressType(e);
     form.setValue("addresstype", e);
   };
+  
 
   return (
     <Modal className="max-w-[40rem]" isOpen={isOpen} onClose={onCloseModal}>
@@ -173,91 +196,93 @@ const AddressModel = () => {
             />
           </div>
           <div className="w-full flex flex-row items-center gap-4">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={handleSelectCity}
-                    value={city}
-                    disabled={!state}
-                  >
-                    <SelectTrigger className="w-full border-none focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0">
-                      <SelectValue placeholder="Select a city" />
-                    </SelectTrigger>
-                    <SelectContent {...field}>
-                      <SelectGroup>
-                        <SelectLabel>City</SelectLabel>
-                        {City.getCitiesOfState(country, state) &&
-                          City.getCitiesOfState(country, state).map((item) => (
-                            <SelectItem value={item.name}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Zip Code</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter the zip code..."
-                    {...field}
-                    className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={handleSelectCity}
+                      value={city}
+                      disabled={!state}
+                    >
+                      <SelectTrigger className="w-full border-none focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0">
+                        <SelectValue placeholder="Select a city" />
+                      </SelectTrigger>
+                      <SelectContent {...field}>
+                        <SelectGroup>
+                          <SelectLabel>City</SelectLabel>
+                          {City.getCitiesOfState(country, state) &&
+                            City.getCitiesOfState(country, state).map(
+                              (item) => (
+                                <SelectItem value={item.name}>
+                                  {item.name}
+                                </SelectItem>
+                              )
+                            )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Zip Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter the zip code..."
+                      {...field}
+                      className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <div className="w-full flex flex-row items-center gap-4">
-          <FormField
-            control={form.control}
-            name="address1"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Address 1</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter the address 1"
-                    {...field}
-                    className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address2"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Address 2</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter the address 2"
-                    {...field}
-                    className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="address1"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Address 1</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter the address 1"
+                      {...field}
+                      className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address2"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Address 2</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter the address 2"
+                      {...field}
+                      className="focus-visible:ring-1 bg-accent rounded-sm focus-visible:ring-offset-0 border-none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <FormField
             control={form.control}
