@@ -196,6 +196,15 @@ export const authApiSlice = apiSlice.injectEndpoints({
         dispatch(logoutShop());
       },
     }),
+
+    updatePassword: builder.mutation({
+      query: (data: any) => ({
+        url: "user/update-password",
+        method: "PATCH",
+        body: data,
+        credentials: "include" as const,
+      }),
+    })
   }),
 });
 export const {
@@ -210,5 +219,6 @@ export const {
   useUpdateUserInfoMutation,
   useUpdateUserAvatarMutation,
   useUpdateUserAddressMutation,
-  useDeleteUserAddressMutation
+  useDeleteUserAddressMutation,
+  useUpdatePasswordMutation
 } = authApiSlice;

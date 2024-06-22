@@ -45,7 +45,7 @@ const AddressModel = () => {
   const { isOpen } = useSelector((state: any) => state.addressModel);
   const [avatar, setAvatar] = useState(null);
 
-  const [updateUserAddress, { isLoading }] = useUpdateUserAddressMutation();
+  const [updateUserAddress, { isLoading, isSuccess }] = useUpdateUserAddressMutation();
 
   const { toast } = useToast();
   const dispatch = useDispatch();
@@ -128,8 +128,15 @@ const AddressModel = () => {
     setAddressType(e);
     form.setValue("addresstype", e);
   };
-  
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        description: "Address updated successfully",
+      });
+    }
+  },[isSuccess]);
+  
   return (
     <Modal className="max-w-[40rem]" isOpen={isOpen} onClose={onCloseModal}>
       <Form {...form}>
@@ -321,6 +328,7 @@ const AddressModel = () => {
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/80 text-white"
+              disabled={isLoading}
             >
               Save
             </Button>

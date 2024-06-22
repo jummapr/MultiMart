@@ -18,6 +18,7 @@ import {
   CircleDollarSign,
   Heart,
   ListRestart,
+  LockKeyhole,
   LogOut,
   Menu,
   MessageCircleMore,
@@ -243,8 +244,8 @@ const Navbar = () => {
                     </Link>
                     <Link href={"/payment/method"}>
                       <DropdownMenuItem className="cursor-pointer">
-                        <CircleDollarSign className="mr-2 w-4 h-4" />
-                        <span>Payment Method</span>
+                        <LockKeyhole className="mr-2 w-4 h-4" />
+                        <span>Update Password</span>
                       </DropdownMenuItem>
                     </Link>
                     <Link href={"/address"}>

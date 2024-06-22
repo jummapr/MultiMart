@@ -395,17 +395,17 @@ export const updateUserInfo = asyncHandler(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
     const { id } = req.user;
 
-    const {name,email, password, phoneNumber} = req.body;
+    const { name, email, password, phoneNumber } = req.body;
 
     const user = await User.findById(id).select("+password");
 
-    if(!user) {
+    if (!user) {
       throw new ApiError(400, "User doesn't exist.");
     }
 
     const isMatch = await user.comparePassword(password);
 
-    if(!isMatch) {
+    if (!isMatch) {
       throw new ApiError(400, "Invalid credentials");
     }
 
@@ -415,8 +415,9 @@ export const updateUserInfo = asyncHandler(
 
     await user.save();
 
-    res.status(200).json(new ApiResponse(200, "User updated successfully.", user));
-
+    res
+      .status(200)
+      .json(new ApiResponse(200, "User updated successfully.", user));
   }
 );
 
@@ -427,25 +428,24 @@ export const updateUserAvatar = asyncHandler(
 
     const user = await User.findById(id);
 
-    if(!user) {
+    if (!user) {
       throw new ApiError(400, "User doesn't exist.");
     }
 
-    if(user?.avatar?.public_id) {
+    if (user?.avatar?.public_id) {
       await deleteTheOldPicture(user.avatar.public_id);
     }
 
     const file = req.file;
 
-
-    if(!file) {
+    if (!file) {
       throw new ApiError(400, "Please upload a file.");
     }
 
     const uploadedOnCloudinary = await uploadOnCloudinary(file?.path);
 
-    if(!uploadOnCloudinary) {
-      throw new ApiError(400,  "avatar not uploaded!, please try again.")
+    if (!uploadOnCloudinary) {
+      throw new ApiError(400, "avatar not uploaded!, please try again.");
     }
 
     user.avatar.public_id = uploadedOnCloudinary.public_id;
@@ -453,27 +453,32 @@ export const updateUserAvatar = asyncHandler(
 
     await user.save();
 
-    res.status(200).json(new ApiResponse(200, "User avatar updated successfully", user));
+    res
+      .status(200)
+      .json(new ApiResponse(200, "User avatar updated successfully", user));
   }
-) 
+);
 
 // Update the user address
 export const updateUserAddress = asyncHandler(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
     const { id } = req.user;
 
-    const {country, state, city,zipCode,address1,address2,addresstype} = req.body
-    
+    const { country, state, city, zipCode, address1, address2, addresstype } =
+      req.body;
+
     const user = await User.findById(id);
 
-    if(!user) {
+    if (!user) {
       throw new ApiError(400, "User doesn't exist.");
     }
 
-    const isAddressExist = user.address.find((address) => address.addresstype === addresstype)
+    const isAddressExist = user.address.find(
+      (address) => address.addresstype === addresstype
+    );
 
-    if(isAddressExist) {
-      throw new ApiError(400, "address already exist")
+    if (isAddressExist) {
+      throw new ApiError(400, "address already exist");
     }
 
     const newAddress = {
@@ -483,14 +488,16 @@ export const updateUserAddress = asyncHandler(
       zipCode,
       address1,
       address2,
-      addresstype
+      addresstype,
     };
 
     user.address.push(newAddress);
 
     await user.save();
 
-    res.status(200).json(new ApiResponse(200, "Address added successfully.", user));
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Address added successfully.", user));
   }
 );
 
@@ -499,17 +506,19 @@ export const deleteUserAddress = asyncHandler(
     const { id } = req.user;
 
     const addresstype: any = req.params.addresstype;
-    console.log(addresstype)
+    console.log(addresstype);
     const user = await User.findById(id);
 
-    if(!user) {
+    if (!user) {
       throw new ApiError(400, "User doesn't exist.");
     }
 
     // NOTE: what's the use of findIndex method?
-    const addressIndex = user.address.findIndex((address) => address.addresstype === addresstype);
+    const addressIndex = user.address.findIndex(
+      (address) => address.addresstype === addresstype
+    );
 
-    console.log("Address Index", addressIndex)
+    console.log("Address Index", addressIndex);
 
     if (addressIndex === -1) {
       throw new ApiError(400, "Address not found.");
@@ -520,6 +529,39 @@ export const deleteUserAddress = asyncHandler(
 
     await user.save();
 
-    res.status(200).json(new ApiResponse(200, "Address deleted successfully.", user));
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Address deleted successfully.", user));
+  }
+);
+
+// Update the user password
+
+export const updateUserPassword = asyncHandler(
+  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+    const { id } = req.user;
+
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findById(id).select("+password");
+
+    if (!user) {
+      throw new ApiError(400, "User doesn't exist.");
+    }
+
+    // check if oldPassword and user password in database matched.
+    const isMatch = await user.comparePassword(oldPassword);
+
+    if (!isMatch) {
+      throw new ApiError(400, "Old password doesn't match.");
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Password updated successfully.", user));
   }
 );

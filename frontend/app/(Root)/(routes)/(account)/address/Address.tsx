@@ -15,7 +15,7 @@ const Address = () => {
   const { user } = useSelector((state: any) => state.loadUser);
   const { isOpen } = useSelector((state: any) => state.addressModel);
   const [address, setAddress] = React.useState<any>([]);
-  const {toast} = useToast();
+  const { toast } = useToast();
   const dispatch = useDispatch();
 
   const [deleteUserAddress, { isLoading, isSuccess }] =
@@ -25,17 +25,20 @@ const Address = () => {
     dispatch(onOpen());
   };
 
-  const deleteAddressHandler = async(addresstype: string) => {
+  const deleteAddressHandler = async (addresstype: string) => {
     console.log(addresstype);
     await deleteUserAddress(addresstype);
-    toast({
-      title: "Address deleted successfully",
-    });
   };
 
   useEffect(() => {
     setAddress(user?.address);
-  }, [isOpen]);
+
+    if (isSuccess) {
+      toast({
+        title: "Address deleted successfully",
+      });
+    }
+  }, [isOpen, isSuccess]);
   return (
     <div className="px-10 xl:px-32 pt-24 h-screen w-full ">
       <div className="w-full flex items-center justify-between pb-16">
@@ -43,36 +46,48 @@ const Address = () => {
         <Button onClick={handleOpenAddressModel}>Add new</Button>
       </div>
       <div className="w-full flex flex-col gap-4">
-        {address?.map((item: any) => (
-          <Card
-            key={`${item?.zipCode}-${item?.addresstype}`}
-            className="justify-center items-center shadow-md"
-          >
-            <CardContent className="flex items-center justify-center pt-5">
-              <div className="w-full flex items-center justify-between gap-4">
-                <div className="flex gap-4 items-center">
-                  <h2 className="font-semibold text-sm lg:text-base ">
-                    {item?.addresstype}
-                  </h2>
+        {address &&
+          address?.map((item: any) => (
+            <Card
+              key={`${item?.zipCode}-${item?.addresstype}`}
+              className="justify-center items-center shadow-md"
+            >
+              <CardContent className="flex items-center justify-center pt-5">
+                <div className="w-full flex items-center justify-between gap-4">
+                  <div className="flex gap-4 items-center">
+                    <h2 className="font-semibold text-sm lg:text-base ">
+                      {item?.addresstype}
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <h3 className="font-semibold text-xs lg:text-base">
+                      {item?.address1},{item?.address2},{item?.city},
+                      {item?.state},{item?.country}
+                    </h3>
+                  </div>
+                  <div>
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => deleteAddressHandler(item?.addresstype)}
+                      disabled={isLoading}
+                    >
+                      <Trash className="text-red-500" size={15} />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <h3 className="font-semibold text-xs lg:text-base">
-                    {item?.address1},{item?.address2},{item?.city},{item?.state}
-                    ,{item?.country}
-                  </h3>
-                </div>
-                <div>
-                  <Button
-                    variant={"ghost"}
-                    onClick={() => deleteAddressHandler(item?.addresstype)}
-                  >
-                    <Trash className="text-red-500" size={15} />
-                  </Button>
-                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {
+            address && address?.length === 0 &&  (
+              <div className="w-full flex items-center justify-center">
+                <h3 className="font-semibold text-sm lg:text-base">
+                  No address found
+                </h3>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            )
+          }
       </div>
     </div>
   );

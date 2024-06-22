@@ -8,6 +8,7 @@ import {
   updateUserAddress,
   updateUserAvatar,
   updateUserInfo,
+  updateUserPassword,
 } from "../controllers/user.controller";
 import express from "express";
 import { upload } from "../middlewares/multer.middlewares";
@@ -26,5 +27,6 @@ router
   .put(isAuthenticated, upload.single("file"), updateUserAvatar);
 router.route("/update-user-address").put(isAuthenticated, updateUserAddress);
 router.route("/delete-user-address/:addresstype").delete(isAuthenticated, deleteUserAddress);
+router.route("/update-password").patch(isAuthenticated, updateUserPassword)
 
 export default router;

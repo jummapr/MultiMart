@@ -6,13 +6,13 @@ import useAuthRedirect from "@/hooks/useAuthRedirect";
 import {  Trash } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import PaymentMethod from "./PaymentMethod";
+import ChangePassword from "./ChangePassword";
 
-const PaymentMethodPage = () => {
+const UpdatePasswordPage = () => {
   useAuthRedirect()
   return (
-    <PaymentMethod />
+    <ChangePassword />
   );
 };
 
-export default PaymentMethodPage;
+export default UpdatePasswordPage;
