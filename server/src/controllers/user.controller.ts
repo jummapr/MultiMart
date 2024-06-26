@@ -16,6 +16,7 @@ import { sendToken } from "../utils/sendToken";
 import { IGetUserAuthInfoRequest } from "../middlewares/auth.middlewares";
 import Shop from "../models/shop.model";
 import { sendShopToken } from "../utils/sendShopToken";
+import { redis } from "../utils/redis";
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -163,7 +164,16 @@ export const loginUser = asyncHandler(
 export const loadUser = asyncHandler(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
     const { id } = req.user;
+
+    const cachedValue = await redis.get(`user:${id}`);
+
+    if (cachedValue) {
+      return res.status(200).json(new ApiResponse(200, "User fetched from cache.", JSON.parse(cachedValue)));
+    }
+
     const user = await User.findById(id);
+
+    await redis.set(`user:${id}`, JSON.stringify(user));
 
     if (!user) {
       throw new ApiError(400, "User doesn't exist.");
