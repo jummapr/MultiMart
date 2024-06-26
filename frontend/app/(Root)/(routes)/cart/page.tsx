@@ -20,8 +20,10 @@ import { Delete, Trash } from "lucide-react";
 import { addToCart, removeFromCart } from "@/redux/features/cart/cartSlice";
 import { useToast } from "@/components/ui/use-toast";
 import CustomBreadCrumb from "@/components/comman/BreadCrumb";
+import { redirect } from "next/navigation";
 
 const CartPage = () => {
+  const { user } = useSelector((state: any) => state.loadUser);
   const { cart } = useSelector((state: any) => state.cart);
   const [count, setCount] = useState(0);
   const dispatch = useDispatch();
@@ -60,6 +62,14 @@ const CartPage = () => {
       setCount(count - 1);
       const updateCartData = { ...data, qty: count - 1 };
       quantityChangeHandler(updateCartData);
+    }
+  };
+
+  const handleCheckout = () => {
+    if (user) {
+      redirect("/payment")
+    } else {
+      redirect("/login")
     }
   };
 
@@ -182,7 +192,7 @@ const CartPage = () => {
                       <h3>${totalPrice}</h3>
                     </div>
 
-                    <Button>Process to checkout</Button>
+                    <Button onClick={handleCheckout}>Process to checkout</Button>
                   </div>
                 </CardContent>
               </Card>
