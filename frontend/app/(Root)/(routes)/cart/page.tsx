@@ -21,10 +21,14 @@ import { addToCart, removeFromCart } from "@/redux/features/cart/cartSlice";
 import { useToast } from "@/components/ui/use-toast";
 import CustomBreadCrumb from "@/components/comman/BreadCrumb";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const CartPage = () => {
+  const { push } = useRouter();
+
   const { user } = useSelector((state: any) => state.loadUser);
   const { cart } = useSelector((state: any) => state.cart);
+  const { seller } = useSelector((state: any) => state.seller);
   const [count, setCount] = useState(0);
   const dispatch = useDispatch();
   const [isRemoveFromCart, setIsRemoveFromCart] = useState(false);
@@ -66,10 +70,17 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (user) {
-      redirect("/payment")
+    if (seller) {
+      toast({
+        variant: "destructive",
+        description: "Seller can't checkout",
+      });
     } else {
-      redirect("/login")
+      if (user) {
+        push("/checkout");
+      } else {
+        push("/login");
+      }
     }
   };
 
@@ -192,7 +203,9 @@ const CartPage = () => {
                       <h3>${totalPrice}</h3>
                     </div>
 
-                    <Button onClick={handleCheckout}>Process to checkout</Button>
+                    <Button onClick={handleCheckout}>
+                      Process to checkout
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

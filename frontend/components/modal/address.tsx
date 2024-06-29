@@ -90,11 +90,11 @@ const AddressModel = () => {
 
   async function handleAddress(values: z.infer<typeof addressSchema>) {
     const countryByCode = getCountryByCode(values.country);
-    const stateByCode = getStateByCode(values.state, values.country);
+    const stateByCode = await getStateByCode(values.state, values.country);
 
     const addressData = {
-      country: countryByCode?.name,
-      state: stateByCode?.name,
+      country: values.country,
+      state: stateByCode,
       city: values.city,
       zipCode: values.zipCode,
       address1: values.address1,
@@ -171,7 +171,7 @@ const AddressModel = () => {
             />
             <FormField
               control={form.control}
-              name="country"
+              name="state"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>State</FormLabel>

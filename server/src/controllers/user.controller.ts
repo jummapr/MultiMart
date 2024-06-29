@@ -168,7 +168,15 @@ export const loadUser = asyncHandler(
     const cachedValue = await redis.get(`user:${id}`);
 
     if (cachedValue) {
-      return res.status(200).json(new ApiResponse(200, "User fetched from cache.", JSON.parse(cachedValue)));
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            "User fetched from cache.",
+            JSON.parse(cachedValue)
+          )
+        );
     }
 
     const user = await User.findById(id);
@@ -505,6 +513,8 @@ export const updateUserAddress = asyncHandler(
 
     await user.save();
 
+    await redis.set(`user:${id}`, JSON.stringify(user));
+
     res
       .status(200)
       .json(new ApiResponse(200, "Address added successfully.", user));
@@ -523,6 +533,8 @@ export const deleteUserAddress = asyncHandler(
       throw new ApiError(400, "User doesn't exist.");
     }
 
+    await redis.set(`user:${id}`, "");
+
     // NOTE: what's the use of findIndex method?
     const addressIndex = user.address.findIndex(
       (address) => address.addresstype === addresstype
@@ -538,6 +550,8 @@ export const deleteUserAddress = asyncHandler(
     user.address.splice(addressIndex, 1);
 
     await user.save();
+
+    await redis.set(`user:${id}`, JSON.stringify(user));
 
     res
       .status(200)

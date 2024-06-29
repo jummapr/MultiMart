@@ -1,13 +1,39 @@
+"use client"
+
 import styles from "@/styles";
+import Link from "next/link";
 import React from "react";
+import { usePathname } from 'next/navigation'
 
 const CheckoutSteps = ({ active }: { active: number }) => {
+  const pathname = usePathname()
+
+  console.log(pathname,"PathName")
+
+  const data = [
+    {
+      id: 1,
+      title: "Shipping",
+      href: "/shipping",
+    },
+    {
+      id: 2,
+      title: "Payment",
+      href: "/payment",
+    },
+    {
+      id: 3,
+      title: "Success",
+      href: "/success",
+    },
+  ];
+
   return (
     <div className="w-full flex justify-center">
       <div className="w-[90%] 800px:w-[50%] flex items-center flex-wrap">
-        <div className={`${styles.noramlFlex}`}>
-          <div className={`${styles.cart_button}`}>
-            <span className={`${styles.cart_button_text}`}>1.Shipping</span>
+        <div className={`flex items-center`}>
+          <div className={`px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer`}>
+            <span className={`text-[#fff] text-[16px] font-[600]`}>1.Shipping</span>
           </div>
           <div
             className={`${
@@ -18,19 +44,19 @@ const CheckoutSteps = ({ active }: { active: number }) => {
           />
         </div>
 
-        <div className={`${styles.noramlFlex}`}>
+        <div className={`flex items-center`}>
           <div
             className={`${
               active > 1
-                ? `${styles.cart_button}`
-                : `${styles.cart_button} !bg-[#FDE1E6]`
+                ? `px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer`
+                : `px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer !bg-[#FDE1E6]`
             }`}
           >
             <span
               className={`${
                 active > 1
-                  ? `${styles.cart_button_text}`
-                  : `${styles.cart_button_text} !text-[#f63b60]`
+                  ? `text-[#fff] text-[16px] font-[600]`
+                  : `text-[#fff] text-[16px] font-[600] `
               }`}
             >
               2.Payment
@@ -64,6 +90,20 @@ const CheckoutSteps = ({ active }: { active: number }) => {
             </span>
           </div>
         </div>
+        {data.map((item) => (
+          <div className={`flex items-center`}>
+          <div className={`px-[20px] h-[38px] rounded-[20px] bg-[#f63b60] flex items-center justify-center cursor-pointer`}>
+            <span className={`text-[#fff] text-[16px] font-[600]`}>{item.id}.{item.title}</span>
+          </div>
+          <div
+            className={`${
+              active > item.id
+                ? "w-[30px] 800px:w-[70px] h-[4px] !bg-[#f63b60]"
+                : "w-[30px] 800px:w-[70px] h-[4px] !bg-[#FDE1E6]"
+            }`}
+          />
+        </div>
+        ))}
       </div>
     </div>
   );
