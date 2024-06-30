@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { City, Country, State } from "country-state-city";
+import {useRouter} from "next/navigation"
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { City, Country, State } from "country-state-city";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,14 @@ const Checkout = () => {
   const { cart } = useSelector((state: any) => state.cart);
   const { user } = useSelector((state: any) => state.loadUser);
   const { seller } = useSelector((state: any) => state.seller);
+
+  const { push } = useRouter();
+
+  const { discountPrice, couponCodeData } = useSelector(
+    (state: any) => state.coupon
+  );
+
+  console.log(discountPrice, couponCodeData, "Coupon Code data");
 
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
@@ -87,6 +96,43 @@ const Checkout = () => {
     setCity(e);
     form.setValue("city", e);
   };
+
+  const subTotalPrice = cart.reduce((acc: number, item: any) => {
+    return acc + item.qty * item.discountPrice;
+  }, 0);
+
+  const shipping = subTotalPrice * 0.1;
+
+  const totalPrice = couponCodeData
+    ? (subTotalPrice + shipping - discountPrice).toFixed(2)
+    : subTotalPrice + shipping;
+
+    const handlePaymentSubmit = () => {
+      const shippingAddress = {
+        country: form.getValues(
+          "country"
+        ),
+        state: form.getValues("state"),
+        city: form.getValues("city"),
+        zipCode: form.getValues("zipCode"),
+        address1: form.getValues("address1"),
+        address2: form.getValues("address2")
+      }
+
+      const orderData = {
+        cart,
+        totalPrice,
+        subTotalPrice,
+        shipping,
+        discountPrice,
+        shippingAddress,
+        user
+      }
+
+      // update the localStorage with the updated arrays
+      localStorage.setItem("latestOrder",JSON.stringify(orderData))
+      push("/payment")
+    } 
 
   return (
     <div className=" h-full">
@@ -400,37 +446,25 @@ const Checkout = () => {
                 <div className="flex flex-col gap-4">
                   <div className="flex justify-between items-center pt-9">
                     <h3>SubTotal: </h3>
-                    <h3>
-                      $
-                      {cart &&
-                        cart
-                          .map((item: any) =>
-                            item?.discountPrice
-                              ? item?.discountPrice * item?.qty
-                              : item?.originalPrice * item?.qty
-                          )
-                          .reduce((a: any, b: any) => a + b, 0)}
-                    </h3>
+                    <h3>${subTotalPrice}</h3>
                   </div>
                   <Separator />
 
                   <div className="flex justify-between items-center">
                     <h3>Shipping: </h3>
-                    <h3>$100</h3>
+                    <h3>${shipping}</h3>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between items-center">
+                    <h3>Discount: </h3>
+                    <h3>- ${discountPrice}</h3>
                   </div>
                   <Separator />
                   <div className="flex justify-between items-center">
                     <h3>Total: </h3>
                     <h3>
                       $
-                      {cart &&
-                        cart
-                          .map((item: any) =>
-                            item?.discountPrice
-                              ? item?.discountPrice * item?.qty
-                              : item?.originalPrice * item?.qty
-                          )
-                          .reduce((a: any, b: any) => a + b, 0) + 100}
+                      {totalPrice}
                     </h3>
                   </div>
                 </div>
@@ -440,7 +474,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="pt-10 w-full">
-                  <Button type="submit">Place Order</Button>
+                  <Button type="submit" onClick={handlePaymentSubmit}>Place Order</Button>
                 </div>
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { createCouponData, getAllCoupon } from "./couponSlice";
+import { createCouponData, getAllCoupon, getCouponCode } from "./couponSlice";
 
 export const ProductApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -53,6 +53,28 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+
+    getCouponByName: builder.query({
+      query: (data: any) => ({
+        url: `coupon/get-coupon-by-name/${data}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          console.log(result.data);
+          dispatch(
+            getCouponCode({
+              coupon: result.data.data,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
@@ -60,4 +82,5 @@ export const {
   useCreateNewCouponMutation,
   useGetAllCouponMutation,
   useDeleteCouponMutation,
+  useLazyGetCouponByNameQuery
 } = ProductApiSlice;
