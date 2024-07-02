@@ -11,7 +11,7 @@ interface UserSavedAddress {
   form: any;
   userInfo: boolean;
   user: any;
-  setChecked: Dispatch<SetStateAction<string>>;
+  setChecked: Dispatch<SetStateAction<boolean>>;
 }
 
 const UserSavedAddress = (data: UserSavedAddress) => {

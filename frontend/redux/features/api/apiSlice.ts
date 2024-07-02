@@ -2,6 +2,7 @@ import type { Action, PayloadAction } from '@reduxjs/toolkit'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import {useLoadUser} from "../auth/authSlice"
 import { loadSellerUser } from '../auth/sellerSlice';
+import { setStripeApiKey } from '../payment/paymentSlice';
 
 
 export const apiSlice = createApi({
@@ -54,7 +55,28 @@ export const apiSlice = createApi({
                     
                 }
             }
-        })
+        }),
+        getApiKey: builder.query({
+            query: () => ({
+              url: "payment/stripeapikey",
+              method: "GET",
+              credentials: "include" as const,
+            }),
+      
+            async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+              try {
+                const result = await queryFulfilled;
+
+                dispatch(
+                  setStripeApiKey({
+                    stripeApiKey: result.data.apiKey,
+                  })
+                );
+              } catch (error: any) {
+                console.log(error);
+              }
+            },
+          })
     })
 })
 

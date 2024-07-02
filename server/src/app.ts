@@ -33,11 +33,13 @@ import shopRoute from "./routes/shop.route";
 import productRoute from "./routes/product.route";
 import eventRoute from "./routes/event.route";
 import couponRoute from "./routes/coupoun.route";
+import paymentRoute from "./routes/payment.route";
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/shop", shopRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/event", eventRoute);
 app.use("/api/v1/coupon", couponRoute);
+app.use("/api/v1/payment", paymentRoute);
 
 export default app;

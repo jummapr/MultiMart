@@ -14,6 +14,7 @@ import cartSlice from "./features/cart/cartSlice";
 import wishListSlice from "./features/wishlist/wishlistSlice";
 import authModel from "./features/modal/authModel";
 import addressModel from "./features/modal/addressModel";
+import paymentSlice from "./features/payment/paymentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     shop: shopSlice.reducer,
     cart: cartSlice.reducer,
     wishlist: wishListSlice.reducer,
+    payment: paymentSlice.reducer,
 
     [authModel.reducerPath]:  authModel.reducer,
     [addressModel.reducerPath]:  addressModel.reducer,
@@ -41,6 +43,7 @@ const initializeApp = async () => {
   await Promise.all([
     store.dispatch(apiSlice.endpoints.loadUser.initiate({}, {})),
     store.dispatch(apiSlice.endpoints.loadSeller.initiate({}, {})),
+    store.dispatch(apiSlice.endpoints.getApiKey.initiate({}, {})),
   ]);
 };
 
