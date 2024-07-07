@@ -1,22 +1,5 @@
-import ApiError from "../utils/ApiError";
-import ApiResponse from "../utils/ApiResponse";
-import asyncHandler from "../utils/asyncHandler";
-import User from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
-import uploadOnCloudinary, { deleteTheOldPicture } from "../utils/cloudinary";
-import {
-  createActivationToken,
-  createActivationTokenForShop,
-} from "../utils/generateActiveationLink";
-import ejs from "ejs";
-import path from "path";
-import sendMail from "../utils/sendMail";
-import jwt from "jsonwebtoken";
-import { sendToken } from "../utils/sendToken";
-import { IGetUserAuthInfoRequest } from "../middlewares/auth.middlewares";
-import Shop from "../models/shop.model";
-import { sendShopToken } from "../utils/sendShopToken";
-import { redis } from "../utils/redis";
+import asyncHandler from "../utils/asyncHandler";
 
 import Stripe from "stripe";
 
@@ -28,12 +11,25 @@ export const createPayment = asyncHandler(async (req:Request, res:Response, next
 
     const {amount} = req.body;
 
+    console.log(typeof amount)
+
   const myPayment = await stripe.paymentIntents.create({
-    amount,
+    amount: amount,
     currency: "inr",
     description: "Payment for product",
+    // TODO: Set Dynamic address and user  
+    shipping: {
+      name: "Jenny Rosen",
+      address: {
+        line1: "510 Townsend St",
+        postal_code: "98140",
+        city: "San Francisco",
+        state: "CA",
+        country: "US",
+      },
+    },
     metadata: {
-      company: "multiMart"
+      company: "multimart"
     }
   });
   

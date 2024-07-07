@@ -15,6 +15,7 @@ import wishListSlice from "./features/wishlist/wishlistSlice";
 import authModel from "./features/modal/authModel";
 import addressModel from "./features/modal/addressModel";
 import paymentSlice from "./features/payment/paymentSlice";
+import orderSlice from "./features/order/orderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +31,7 @@ export const store = configureStore({
     cart: cartSlice.reducer,
     wishlist: wishListSlice.reducer,
     payment: paymentSlice.reducer,
+    order: orderSlice.reducer,
 
     [authModel.reducerPath]:  authModel.reducer,
     [addressModel.reducerPath]:  addressModel.reducer,

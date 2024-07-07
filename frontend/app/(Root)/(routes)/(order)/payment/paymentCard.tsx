@@ -46,14 +46,38 @@ import {
 } from "@stripe/react-stripe-js";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import {
+  useCreateOrderMutation,
+  useStripePaymentMutation,
+} from "@/redux/features/order/orderApi";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function PaymentCard() {
   const [activeTab, setActiveTab] = useState("card");
   const [orderData, setOrderData] = useState<any>([]);
+  const [paymentSecret, setPaymentSecret] = useState<any>("");
+  const { toast } = useToast();
+  const [stripePaymentStart, setStripePaymentStart] = useState(false);
+
+  const [stripePayment, { isSuccess, data }] = useStripePaymentMutation();
+  const [createOrder, { isLoading, isSuccess: isOrderSuccess, isError }] =
+    useCreateOrderMutation();
+
   const { user } = useSelector((state: any) => state.loadUser);
   const { push } = useRouter();
   const stripe = useStripe();
   const elements = useElements();
+
+  const paymentData = {
+    amount: Math.round(orderData?.totalPrice * 100),
+  };
+
+  const order = {
+    cart: orderData?.cart,
+    shippingAddress: orderData?.shippingAddress,
+    user: user && user,
+    totalPrice: orderData?.totalPrice,
+  };
 
   const form = useForm<z.infer<typeof StripePaymentSchema>>({
     resolver: zodResolver(StripePaymentSchema),
@@ -65,19 +89,74 @@ export default function PaymentCard() {
     },
   });
 
-  console.log("Expires", form.getValues("expires"));
+  console.log(orderData?.shippingAddress)
 
-  function onSubmit(values: z.infer<typeof StripePaymentSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof StripePaymentSchema>) {
+    const response = await stripePayment(paymentData);
+
+
+    const client_secret = response?.data?.client_secret;
+
+    console.log("Client Secret", client_secret);
+    console.log("Type", typeof client_secret);
+
+    
+
+    if (!stripe || !elements) return;
+
+      const result = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: elements.getElement(CardNumberElement),
+          billing_details: {
+            name: values.nameOnCard,
+            email: user?.email,
+            address: {
+              line1: orderData?.shippingAddress?.address1,
+              city: orderData?.shippingAddress?.city,
+              state: orderData?.shippingAddress?.state,
+              postal_code: orderData?.shippingAddress?.pinCode,
+            }
+          },
+        },
+      });
+
+      if (result.error) {
+        toast({
+          title: "Error",
+          description: result.error.message,
+          variant: "destructive",
+        });
+        console.log(result.error);
+      }
+
+      if (result.paymentIntent?.status === "succeeded") {
+        order.paymentInfo = {
+          id: result?.paymentIntent.id,
+          status: result?.paymentIntent.status,
+          type: "Credit Card",
+        };
+
+        console.log("Orders Data",order)
+
+        await createOrder(order);
+
+        toast({
+          title: "Success",
+          description: "Payment successful",
+        });
+
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("latestOrder");
+        push("/order/success");
+      }
   }
 
-  const paypalPaymentHandler = async (data: any, action: any) => {};
+  useEffect(() => {
+    console.log("Data", data?.client_secret);
+    setPaymentSecret(data?.client_secret);
+  }, [isSuccess, data]);
 
-  const paymentData = {
-    amount: Math.round(orderData?.totalPrice * 100),
-  };
+  const paypalPaymentHandler = async (data: any, action: any) => {};
 
   useEffect(() => {
     const orderdata = localStorage.getItem("latestOrder") as string;
@@ -196,7 +275,6 @@ export default function PaymentCard() {
                                   },
                                 },
                               }}
-                              onChange={field.onChange}
                             />
                           </FormControl>
                           <FormMessage />
@@ -236,8 +314,6 @@ export default function PaymentCard() {
                                       },
                                     },
                                   }}
-                                  {...field}
-                                  onChange={field.onChange}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -253,27 +329,25 @@ export default function PaymentCard() {
                             <FormItem>
                               <FormLabel>CVC</FormLabel>
                               <FormControl>
-                              <CardCvcElement 
+                                <CardCvcElement
                                   className="rounded-md border border-input px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:border-primary focus-visible:ring-ring focus-visible:ring-offset-1"
                                   options={{
                                     style: {
                                       base: {
                                         fontSize: "15px",
                                         lineHeight: "1.5",
-                                        color: "#444"
+                                        color: "#444",
                                       },
                                       empty: {
                                         color: "#9CA3AF",
                                         backgroundColor: "transparent",
-                                        "::placeholder" : {
+                                        "::placeholder": {
                                           color: "#444",
-                                          backgroundColor: "transparent"
-                                        }
-                                      }
-                                    }
+                                          backgroundColor: "transparent",
+                                        },
+                                      },
+                                    },
                                   }}
-                                  {...field}
-                                  onChange={field.onChange}
                                 />
                               </FormControl>
                               <FormMessage />
