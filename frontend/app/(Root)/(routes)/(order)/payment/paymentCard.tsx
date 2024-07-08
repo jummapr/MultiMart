@@ -51,10 +51,23 @@ import {
   useStripePaymentMutation,
 } from "@/redux/features/order/orderApi";
 import { useToast } from "@/components/ui/use-toast";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { IOrder } from "@/types";
 
 export default function PaymentCard() {
   const [activeTab, setActiveTab] = useState("card");
-  const [orderData, setOrderData] = useState<any>([]);
+  const [orderData, setOrderData] = useState<any>({});
+  const [open, setOpen] = useState(false);
+
   const [paymentSecret, setPaymentSecret] = useState<any>("");
   const { toast } = useToast();
   const [stripePaymentStart, setStripePaymentStart] = useState(false);
@@ -69,10 +82,11 @@ export default function PaymentCard() {
   const elements = useElements();
 
   const paymentData = {
+    // @ts-ignore
     amount: Math.round(orderData?.totalPrice * 100),
   };
 
-  const order = {
+  const order: IOrder = {
     cart: orderData?.cart,
     shippingAddress: orderData?.shippingAddress,
     user: user && user,
@@ -89,74 +103,126 @@ export default function PaymentCard() {
     },
   });
 
-  console.log(orderData?.shippingAddress)
-
   async function onSubmit(values: z.infer<typeof StripePaymentSchema>) {
-    const response = await stripePayment(paymentData);
-
+    const response: any = await stripePayment(paymentData);
 
     const client_secret = response?.data?.client_secret;
 
-    console.log("Client Secret", client_secret);
-    console.log("Type", typeof client_secret);
-
-    
-
     if (!stripe || !elements) return;
-
-      const result = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
-          billing_details: {
-            name: values.nameOnCard,
-            email: user?.email,
-            address: {
-              line1: orderData?.shippingAddress?.address1,
-              city: orderData?.shippingAddress?.city,
-              state: orderData?.shippingAddress?.state,
-              postal_code: orderData?.shippingAddress?.pinCode,
-            }
+   
+    // @ts-ignore
+    const result = await stripe.confirmCardPayment(client_secret, {
+      // @ts-ignore
+      payment_method: {
+        // @ts-ignore
+        card: elements.getElement(CardNumberElement) | null,
+        billing_details: {
+          name: values.nameOnCard,
+          email: user?.email,
+          address: {
+            line1: orderData?.shippingAddress?.address1,
+            city: orderData?.shippingAddress?.city,
+            state: orderData?.shippingAddress?.state,
+            postal_code: orderData?.shippingAddress?.zipCode,
           },
         },
+      },
+    });
+
+    if (result.error) {
+      toast({
+        title: "Error",
+        description: result.error.message,
+        variant: "destructive",
+      });
+      console.log(result.error);
+    }
+
+    if (result.paymentIntent?.status === "succeeded") {
+      order.paymentInfo = {
+        id: result?.paymentIntent.id,
+        status: result?.paymentIntent.status,
+        type: "Credit Card",
+      };
+
+      console.log("Orders Data", order);
+
+      await createOrder(order);
+
+      toast({
+        title: "Success",
+        description: "Payment successful",
       });
 
-      if (result.error) {
-        toast({
-          title: "Error",
-          description: result.error.message,
-          variant: "destructive",
-        });
-        console.log(result.error);
-      }
-
-      if (result.paymentIntent?.status === "succeeded") {
-        order.paymentInfo = {
-          id: result?.paymentIntent.id,
-          status: result?.paymentIntent.status,
-          type: "Credit Card",
-        };
-
-        console.log("Orders Data",order)
-
-        await createOrder(order);
-
-        toast({
-          title: "Success",
-          description: "Payment successful",
-        });
-
-        localStorage.removeItem("cartItems");
-        localStorage.removeItem("latestOrder");
-        push("/order/success");
-      }
+      localStorage.removeItem("cartItems");
+      localStorage.removeItem("latestOrder");
+      push("/order/success");
+    }
   }
+
+  const createPaypalOrder = (data: any, actions: any) => {
+    return actions.order
+      ?.create({
+        purchase_units: [
+          {
+            description: "Order",
+            amount: {
+              value: orderData?.totalPrice,
+            },
+          },
+        ],
+        application_context: {
+          shipping_preference: "NO_SHIPPING",
+        },
+      })
+      .then((orderId: string) => {
+        return orderId;
+      });
+  };
+
+  const createCashOnDelivery = async() => {
+    order.paymentInfo = {
+      type: "Cash On Delivery",
+    };
+
+    await createOrder(order);
+  }
+
+  const paypalPaymentHandler = async (paymentInfo: any) => {
+    order.paymentInfo = {
+      id: paymentInfo?.payer_id,
+      status: "Succeeded",
+      type: "Paypal",
+    };
+
+    await createOrder(order);
+
+    toast({
+      title: "Success",
+      description: "Payment successful",
+    });
+
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("latestOrder");
+    push("/order/success");
+  };
+
+  const onApprove = async (data: any, action: any) => {
+    return action.order.capture().then((details: any) => {
+      const { payer } = details;
+
+      let paymentInfo = payer;
+
+      if (paymentInfo !== undefined) {
+        paypalPaymentHandler(paymentInfo);
+      }
+    });
+  };
 
   useEffect(() => {
     console.log("Data", data?.client_secret);
     setPaymentSecret(data?.client_secret);
   }, [isSuccess, data]);
-
-  const paypalPaymentHandler = async (data: any, action: any) => {};
 
   useEffect(() => {
     const orderdata = localStorage.getItem("latestOrder") as string;
@@ -487,7 +553,20 @@ export default function PaymentCard() {
                 </p>
               </div>
               <div className="flex justify-end items-center">
-                <Button>Pay Now</Button>
+                <Button onClick={() => setOpen(true)}>Pay Now</Button>
+
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogContent className="">
+                    <div className="flex justify-center items-center w-full h-[30rem] overflow-y-auto">
+                      <PayPalButtons
+                        style={{ layout: "vertical" }}
+                        onApprove={onApprove}
+                        className="w-full mt-10"
+                        createOrder={createPaypalOrder}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </TabsContent>
@@ -553,15 +632,11 @@ export default function PaymentCard() {
               </div>
 
               <div className="flex justify-end items-center">
-                <Button>Pay Now</Button>
+                <Button onClick={() => createCashOnDelivery()}>Pay Now</Button>
               </div>
             </CardContent>
           </TabsContent>
         </Tabs>
-        {/* <CardFooter className="flex justify-end gap-2">
-          <Button variant="outline">Cancel</Button>
-          <Button>Pay Now</Button>
-        </CardFooter> */}
       </Card>
     </div>
   );

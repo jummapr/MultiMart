@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useLoadUserQuery } from "../redux/features/api/apiSlice";
 import CustomUserLoad from "@/components/provider/custom-user-load";
 import { ModalProvider } from "@/components/provider/ModalProvider";
+import { PayPalProvider } from "@/components/provider/PaypalProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <PayPalProvider>
         <ReduxProvider>
           <Navbar />
           <Toaster />
@@ -33,6 +35,7 @@ export default function RootLayout({
           <CustomUserLoad>{children}</CustomUserLoad>
           <Footer />
         </ReduxProvider>
+        </PayPalProvider>
       </body>
     </html>
   );
