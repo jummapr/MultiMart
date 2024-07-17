@@ -109,7 +109,7 @@ export default function PaymentCard() {
     const client_secret = response?.data?.client_secret;
 
     if (!stripe || !elements) return;
-   
+
     // @ts-ignore
     const result = await stripe.confirmCardPayment(client_secret, {
       // @ts-ignore
@@ -180,13 +180,21 @@ export default function PaymentCard() {
       });
   };
 
-  const createCashOnDelivery = async() => {
+  const createCashOnDelivery = async () => {
     order.paymentInfo = {
       type: "Cash On Delivery",
     };
 
     await createOrder(order);
-  }
+    toast({
+      title: "Success",
+      description: "Payment successful",
+    });
+
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("latestOrder");
+    push("/order/success");
+  };
 
   const paypalPaymentHandler = async (paymentInfo: any) => {
     order.paymentInfo = {

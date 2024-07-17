@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ProductTable from "./components/productTable";
 import AddProductModal from "./components/AddProductModal";
+import SellerOrders from "./components/orders";
 
 function page() {
   return (
     <div>
       <div className="w-full pt-11 px-20">
         <div className=" flex justify-between">
-          <Title>Products</Title>
-          <AddProductModal />
+          <Title>Orders</Title>
         </div>
         <div>
-          <ProductTable />
+          <SellerOrders />
         </div>
       </div>
     </div>

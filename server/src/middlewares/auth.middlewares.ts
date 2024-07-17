@@ -31,7 +31,7 @@ export const isAuthenticated = asyncHandler(
 export const isSeller = asyncHandler(
     async (req: IGetUserAuthInfoRequest,res:Response,next:NextFunction) => {
         const {seller_token} = req.cookies;
-        console.log("Seller Token",seller_token)
+        // console.log("Seller Token",seller_token)
 
         if(!seller_token){
             throw new ApiError(400,"Please login seller account first then you can continue.")

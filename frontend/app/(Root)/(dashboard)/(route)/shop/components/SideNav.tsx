@@ -31,7 +31,7 @@ function SideNav() {
     {
       label: "All Orders",
       icon: ShoppingBasket,
-      href: "/shop/product",
+      href: "/shop/orders",
     },
     {
       label: "All Products",

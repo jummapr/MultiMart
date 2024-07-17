@@ -69,7 +69,7 @@ const Login = () => {
       console.log(errorData);
       toast({
         variant: "destructive",
-        description: errorData.data.message,
+        description: errorData?.data?.message,
       });
     }
 

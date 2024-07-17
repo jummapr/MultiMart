@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { setOrders } from "./orderSlice";
+import { setAllSellerOrders, setAllUserOrders, setOrders } from "./orderSlice";
 
 export const OrderApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -33,8 +33,57 @@ export const OrderApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include" as const,
       }),
-    })
+    }),
+
+    getAllUserOrders: builder.query({
+      query: (data: any) => ({
+        url: `order/get-orders/${data}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          // console.log(result.data);
+          dispatch(
+            setAllUserOrders({
+              userOrders: result.data.data,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
+
+    getAllSellerOrders: builder.query({
+      query: (data: any) => ({
+        url: `order/get-all-seller-orders/${data}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+
+      async onQueryStarted(arg: any, { queryFulfilled, dispatch }: any) {
+        try {
+          const result = await queryFulfilled;
+          // console.log(result.data);
+          dispatch(
+            setAllSellerOrders({
+              sellerOrders: result.data.data,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
-export const {useCreateOrderMutation,useStripePaymentMutation} = OrderApi;
+export const {
+  useCreateOrderMutation,
+  useStripePaymentMutation,
+  useGetAllUserOrdersQuery,
+  useLazyGetAllSellerOrdersQuery
+} = OrderApi;
