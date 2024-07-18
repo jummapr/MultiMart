@@ -16,6 +16,7 @@ import authModel from "./features/modal/authModel";
 import addressModel from "./features/modal/addressModel";
 import paymentSlice from "./features/payment/paymentSlice";
 import orderSlice from "./features/order/orderSlice";
+import commentModel from "./features/modal/commentModel";
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
 
     [authModel.reducerPath]:  authModel.reducer,
     [addressModel.reducerPath]:  addressModel.reducer,
+    [commentModel.reducerPath]:  commentModel.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

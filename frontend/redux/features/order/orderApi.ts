@@ -78,6 +78,20 @@ export const OrderApi = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    updateOrderStatus: builder.mutation({
+      query: (args: any) => {
+        console.log(typeof args.status);
+        console.log(args.status);
+        return {
+        url: `order/update-order-status/${args.orderId}`,
+        method: "POST",
+        body: {
+          status: args.status,
+        },
+        credentials: "include" as const,
+      }},
+    }),
   }),
 });
 
@@ -85,5 +99,6 @@ export const {
   useCreateOrderMutation,
   useStripePaymentMutation,
   useGetAllUserOrdersQuery,
-  useLazyGetAllSellerOrdersQuery
+  useLazyGetAllSellerOrdersQuery,
+  useUpdateOrderStatusMutation,
 } = OrderApi;

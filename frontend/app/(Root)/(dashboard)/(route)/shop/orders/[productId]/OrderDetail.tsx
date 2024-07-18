@@ -12,8 +12,8 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { Country, State, City } from "country-state-city";
 
 import {
@@ -26,18 +26,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useUpdateOrderStatusMutation } from "@/redux/features/order/orderApi";
+import { useToast } from "@/components/ui/use-toast";
+import {useRouter} from "next/navigation"
+import { onOpen } from "@/redux/features/modal/commentModel";
 
 const OrderDetailComponents = () => {
   const [status, setStatus] = useState("");
 
+  const {push} = useRouter()
+
   const { sellerOrders } = useSelector((state: any) => state.order);
+  const dispatch = useDispatch();
+
+  const { toast } = useToast();
+
+  const [updateOrderStatus, { isLoading, isSuccess, isError, error }] =
+    useUpdateOrderStatusMutation();
 
   const { productId } = useParams();
 
   const data =
     sellerOrders && sellerOrders.find((item: any) => item._id === productId);
 
-  console.log("Data is", data);
 
   const formattedDate = data?.createdAt
     ? new Date(data?.createdAt).toLocaleDateString("en-US", {
@@ -84,11 +95,41 @@ const OrderDetailComponents = () => {
     ].indexOf(data?.status)
   );
 
-  console.log(status);
+  const updateOrder = async () => {
+    const OrderData: {
+      orderId: string;
+      data: string;
+    } = {
+      orderId: data?._id,
+      data: status,
+    };
 
-  const updateOrder = () => {
-    console.log("Updated the status")
+    await updateOrderStatus({
+      orderId: OrderData?.orderId,
+      status: OrderData?.data,
+    });
+    push("/shop/orders")  
+  };
+
+  const onCommentModel = () => {
+    dispatch(onOpen())
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Order status updated successful.",
+        variant: "default",
+      });
+    }
+
+    if (isError) {
+      toast({
+        title: "Order status updated failed.",
+        variant: "destructive",
+      });
+    }
+  },[isSuccess, isError]);
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 flex flex-col items-center justify-center min-h-[calc(100vh_-_theme(spacing.8))]">
@@ -160,7 +201,7 @@ const OrderDetailComponents = () => {
               </Select>
             </div>
             <div>
-              <Button onClick={() => updateOrder()}>Submit</Button>
+              <Button onClick={updateOrder}>Submit</Button>
             </div>
           </div>
         </div>
@@ -190,7 +231,11 @@ const OrderDetailComponents = () => {
               <div className="flex items-center gap-4">
                 <div className="text-muted-foreground">Payment Status</div>
                 <div>
-                <Badge variant={"default"}>{data?.paymentInfo?.status ? data?.paymentInfo?.status : "Not Paid"}</Badge>
+                  <Badge variant={"default"}>
+                    {data?.paymentInfo?.status
+                      ? data?.paymentInfo?.status
+                      : "Not Paid"}
+                  </Badge>
                 </div>
               </div>
             </CardContent>

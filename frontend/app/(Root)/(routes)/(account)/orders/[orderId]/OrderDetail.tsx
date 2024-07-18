@@ -12,7 +12,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { Country, State, City } from "country-state-city";
 
@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { onOpen } from "@/redux/features/modal/commentModel";
 
 const UserOrderDetail = () => {
   const [status, setStatus] = useState("");
@@ -33,6 +34,7 @@ const UserOrderDetail = () => {
   const { userOrders } = useSelector((state: any) => state.order);
 
   const { orderId } = useParams();
+  const dispatch = useDispatch();
 
   console.log("Order Id", orderId);
 
@@ -65,6 +67,10 @@ const UserOrderDetail = () => {
   const subTotal = data?.cart.map(
     (item: any) => item?.discountPrice * item?.qty
   );
+
+  const onCommentModel = () => {
+    dispatch(onOpen())
+  }
 
   const shipping = subTotalPrice * 0.1;
 
@@ -115,6 +121,11 @@ const UserOrderDetail = () => {
                       <TableCell className="text-right">
                         ${item?.discountPrice * item?.qty}
                       </TableCell>
+                      {data?.status === "Delivered" && (
+                        <TableCell className="text-right">
+                          <Button onClick={onCommentModel}>Write a review</Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
               </TableBody>
@@ -138,7 +149,7 @@ const UserOrderDetail = () => {
                 </div>
 
                 <div className="flex items-center gap-4 pt-11">
-                    <Button>Send Message to seller</Button>
+                  <Button>Send Message to seller</Button>
                 </div>
               </address>
             </CardContent>

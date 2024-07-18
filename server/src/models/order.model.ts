@@ -9,7 +9,11 @@ export interface IOrder extends Document {
   user: IUser;
   totalPrice: number;
   status: string;
-  paymentInfo: object;
+  paymentInfo: {
+    id: string;
+    status: string;
+    type: string;
+  };
   paidAt: Date;
   deliverAt: Date;
   createdAt: Date;

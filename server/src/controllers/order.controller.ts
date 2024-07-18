@@ -3,6 +3,7 @@ import Order from "../models/order.model";
 import asyncHandler from "../utils/asyncHandler";
 import ApiResponse from "../utils/ApiResponse";
 import ApiError from "../utils/ApiError";
+import Product from "../models/product.model";
 
 // create new order
 
@@ -57,8 +58,9 @@ export const getAllUserOrders = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.params.userId;
 
-    if (!userId)
-      return res.status(400).json(new ApiError(400, "User Id is required."));
+    if (!userId) {
+      throw new ApiError(400, "User Id is required.");
+    }
 
     const orders = await Order.find({ "user._id": userId }).sort({
       createdAt: -1,
@@ -77,19 +79,80 @@ export const getAllSellerOrders = asyncHandler(
   async (req: Request, res: Response) => {
     const sellerId = req.params.shopId;
 
-
     if (!sellerId) {
-      return res.status(400).json(new ApiError(400, "Shop Id is required."));
+      throw new ApiError(400, "Shop Id is required.");
     }
-
 
     const orders = await Order.find({ "cart.shopId": sellerId }).sort({
       createdAt: -1,
     });
 
-
     res
       .status(200)
       .json(new ApiResponse(200, "Orders fetched successfully.", orders));
+  }
+);
+
+// NOTE: I got error in this API. so I have to fix this tomorrow. error is that status is showing empty string
+// Order Status Changed NOTE: Only seller can change
+export const changeOrderStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const {status} = req.body;
+
+    // Event thogh I sending data from client but still body is undefined. I'll  work later after sleep.
+    console.log("Body: ", req.body);
+    
+    console.log("Order Id: ", orderId);
+    console.log("Started..");
+
+    if (!orderId) {
+      throw new ApiError(400, "Order Id is required.");
+    }
+
+    if(!status) {
+      throw new ApiError(400, "Status is required.")
+    }
+
+    console.log("Validation cheked..");
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      throw new ApiError(400, "Order not found.");
+    }
+
+    if(status === "Transfer to delivery partner") {
+      order.cart.forEach(async (item: any) => {
+          await updateProduct(item._id, item.qty, "Transfer to delivery partner");
+      })
+    }
+
+    async function updateProduct(id: string, qty: number, status: string) {
+      const product = await Product.findById(id);
+
+      if (!product) {
+        throw new ApiError(404, "Product not found.");
+      }
+
+      product.stock -= qty;
+      product.sold_out += qty;
+
+      await product.save({ validateBeforeSave: false });
+    }
+
+    order.status = status;
+
+    if(status === "Delivered") {
+      // @ts-ignore
+      order.deliverAt = Date.now();
+      order.paymentInfo.status = "Succeeded";
+    }
+
+    await order.save({ validateBeforeSave: false });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Order status updated successful.", order));
   }
 );
