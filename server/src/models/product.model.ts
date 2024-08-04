@@ -17,9 +17,28 @@ export interface IProduct extends Document {
       url: string;
     }
   ];
+  rattings: number;
   shopId: string;
   shop: object;
   sold_out: number;
+  reviews: [
+    {
+      user: {
+        _id: any;
+        name: string;
+        email: string;
+        avatar: {
+          public_id: string;
+          url: string;
+        };
+        role: string;
+      };
+      ratting: number;
+      comment?: string;
+      productId: string;
+      createdAt?: Date;
+    }
+  ]
 }
 
 const productSchema: Schema<IProduct> = new mongoose.Schema(
@@ -67,6 +86,29 @@ const productSchema: Schema<IProduct> = new mongoose.Schema(
       type: String,
       required: true,
     },
+    reviews: [
+      {
+        user: {
+          type: Object,
+        },
+        ratting: {
+          type: Number,
+        },
+        comment: {
+          type: String,
+        },
+        productId: {
+          type: String,
+        },
+        createdAt:{
+          type: Date,
+          default: Date.now(),
+        }
+      },
+    ],
+    rattings: {
+      type: Number,
+    },
     shop: {
       type: Object,
       required: true,
@@ -79,6 +121,6 @@ const productSchema: Schema<IProduct> = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Product: Model<IProduct> = mongoose.model("product", productSchema);
+const Product: Model<IProduct> = mongoose.model("Product", productSchema);
 
 export default Product;

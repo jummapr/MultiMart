@@ -7,6 +7,8 @@ import ejs from "ejs";
 import path from "path";
 import Product from "../models/product.model";
 import Shop from "../models/shop.model";
+import Comment from "../models/comment.model";
+import orderModel from "../models/order.model";
 
 export const createProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -77,7 +79,6 @@ export const createProduct = asyncHandler(
 // get all product from shop
 export const getAllProduct = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-
     const product = await Product.find();
 
     if (!product) {
@@ -162,8 +163,8 @@ export const getShopInfo = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const shopId = req.params.id;
 
-    if(!shopId) {
-      throw new ApiError(400,"Shop Id is required.");
+    if (!shopId) {
+      throw new ApiError(400, "Shop Id is required.");
     }
 
     const shop = await Shop.findById({ _id: shopId });
@@ -172,7 +173,9 @@ export const getShopInfo = asyncHandler(
       throw new ApiError(404, "Shop not found.");
     }
 
-    res.status(200).json(new ApiResponse(200,"Shop Info fetched successfully!",shop))
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Shop Info fetched successfully!", shop));
   }
 );
 
@@ -181,9 +184,9 @@ export const getShopInfo = asyncHandler(
 export const getProductById = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const ProductId = req.params.id;
-     
-    if(!ProductId) {
-      throw new ApiError(400,"Product Id is required.");
+
+    if (!ProductId) {
+      throw new ApiError(400, "Product Id is required.");
     }
 
     const product = await Product.findById({ _id: ProductId });
@@ -192,6 +195,60 @@ export const getProductById = asyncHandler(
       throw new ApiError(404, "Product not found.");
     }
 
-    res.status(200).json(new ApiResponse(200,"Product fetched successfully!",product))
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Product fetched successfully!", product));
   }
 );
+
+// create reviews for products
+
+// TODO: if user already give that reviews then review button shoud not appear
+// TODO: user review is pending.
+export const createReview = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { user, productId, ratting, comment, orderId } = req.body;
+
+    // get reviews then check if user already reviewed that product or not if yes then update else create
+    const product = await Product.findById(productId);
+
+    const review = {
+      user,
+      ratting,
+      comment,
+      productId,
+    };
+
+    const isReviewed = product.reviews.find((rev) => rev.user._id === user._id);
+
+    if (isReviewed) {
+      product.reviews.forEach((rev: any) => {
+        if (rev.user._id === user._id) {
+          (rev.ratting = ratting), (rev.comment = comment), (rev.user = user);
+        }
+      });
+    } else {
+      product.reviews.push(review);
+    }
+
+    let avg = 0;
+
+    product.reviews.forEach((rev) => {
+      avg += rev.ratting;
+    });
+
+    product.rattings = avg / product.reviews.length;
+
+    await product.save({ validateBeforeSave: false });
+
+    await orderModel.findByIdAndUpdate(
+      orderId,
+      { $set: { "cart.$[elem].isReviewed": true } },
+      { arrayFilters: [{ "elem._id": productId }], new: true }
+    );
+
+    res.status(201).json(new ApiResponse(201, "Reviewed successfully!", {}));
+  }
+);
+
+

@@ -60,6 +60,14 @@ export const ProductApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include" as const,
       }),
+    }),
+    reviewProduct: builder.mutation({
+      query: (data: any) => ({
+        url: `product/reviewed-product`,
+        method: "PATCH",
+        body: data,
+        credentials: "include" as const,
+      }),
     })
   }),
 });
@@ -69,4 +77,5 @@ export const {
   useAllProductMutation,
   useDeleteProductMutation,
   useProductDetailQuery,
+  useReviewProductMutation
 } = ProductApiSlice;

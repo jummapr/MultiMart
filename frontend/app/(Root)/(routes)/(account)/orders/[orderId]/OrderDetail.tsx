@@ -13,7 +13,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Country, State, City } from "country-state-city";
 
 import {
@@ -26,22 +26,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { onOpen } from "@/redux/features/modal/commentModel";
+import { onOpen, setProductId } from "@/redux/features/modal/commentModel";
+import Link from "next/link";
+import { useGiveRefundMutation } from "@/redux/features/order/orderApi";
+import { useToast } from "@/components/ui/use-toast";
 
 const UserOrderDetail = () => {
   const [status, setStatus] = useState("");
+
+  const {toast} = useToast();
+
+  const [giveRefund, { isLoading, isSuccess, isError, error }] = useGiveRefundMutation();
 
   const { userOrders } = useSelector((state: any) => state.order);
 
   const { orderId } = useParams();
   const dispatch = useDispatch();
 
-  console.log("Order Id", orderId);
+  // console.log("Order Id", orderId);
 
   const data =
     userOrders && userOrders.find((item: any) => item._id === orderId);
 
-  console.log("Data is", data);
+  // console.log("Data is", data);
 
   const formattedDate = data?.createdAt
     ? new Date(data?.createdAt).toLocaleDateString("en-US", {
@@ -68,9 +75,29 @@ const UserOrderDetail = () => {
     (item: any) => item?.discountPrice * item?.qty
   );
 
-  const onCommentModel = () => {
-    dispatch(onOpen())
-  }
+  const onCommentModel = (id: string) => {
+    dispatch(onOpen());
+    dispatch(setProductId(id));
+  };
+
+  const handleRefund = async () => {
+    await giveRefund({ orderId, status: "Processing refund" });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Refund successfully.",
+        variant: "default",
+      })
+    }
+    if (isError) {
+      toast({
+        title: "Something went wrong.",
+        variant:"destructive"
+      });
+    }
+  },[isSuccess, isError]);
 
   const shipping = subTotalPrice * 0.1;
 
@@ -123,7 +150,9 @@ const UserOrderDetail = () => {
                       </TableCell>
                       {data?.status === "Delivered" && (
                         <TableCell className="text-right">
-                          <Button onClick={onCommentModel}>Write a review</Button>
+                          <Button onClick={() => onCommentModel(item._id)}>
+                            Write a review
+                          </Button>
                         </TableCell>
                       )}
                     </TableRow>
@@ -168,6 +197,12 @@ const UserOrderDetail = () => {
                       : "Not Paid"}
                   </Badge>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-4 pt-16">
+                {data?.status === "Delivered" && (
+                    <Button onClick={() => handleRefund()}>Give Refund</Button>
+                )}
               </div>
             </CardContent>
           </Card>

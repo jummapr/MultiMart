@@ -111,11 +111,11 @@ export default function PaymentCard() {
     if (!stripe || !elements) return;
 
     // @ts-ignore
-    const result = await stripe.confirmCardPayment(client_secret, {
+    const result = await stripe?.confirmCardPayment(client_secret, {
       // @ts-ignore
       payment_method: {
         // @ts-ignore
-        card: elements.getElement(CardNumberElement) | null,
+        card: elements.getElement(CardNumberElement),
         billing_details: {
           name: values.nameOnCard,
           email: user?.email,

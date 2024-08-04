@@ -93,7 +93,6 @@ export const getAllSellerOrders = asyncHandler(
   }
 );
 
-// NOTE: I got error in this API. so I have to fix this tomorrow. error is that status is showing empty string
 // Order Status Changed NOTE: Only seller can change
 export const changeOrderStatus = asyncHandler(
   async (req: Request, res: Response) => {
@@ -154,5 +153,36 @@ export const changeOrderStatus = asyncHandler(
     res
       .status(200)
       .json(new ApiResponse(200, "Order status updated successful.", order));
+  }
+);
+
+// give refund 
+export const orderRefund = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const {status} = req.body;
+
+
+    if (!orderId) {
+      throw new ApiError(400, "Order Id is required.");
+    }
+
+    if(!status) {
+      throw new ApiError(400, "Status is required.");
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      throw new ApiError(400, "Order not found.");
+    }
+
+    order.status = status;
+    
+    await order.save({ validateBeforeSave: false });
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, "Order refund successful.", order));
   }
 );
