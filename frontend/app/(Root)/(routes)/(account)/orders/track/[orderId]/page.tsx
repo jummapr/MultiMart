@@ -36,6 +36,10 @@ const page = () => {
         </h2>
       ) : data?.status === "Delivered" ? (
         <h2 className="text-[20px]">Your order is delivered.</h2>
+      ) : data?.status === "Processing refund" ? (
+        <h2 className="text-[20px]">Your refund is processing!</h2>
+      ) : data?.status === "Refund success" ? (
+        <h2 className="text-[20px]">Your refund is success!</h2>
       ) : null}
     </div>
   );

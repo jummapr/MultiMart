@@ -105,6 +105,17 @@ export const OrderApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }},
     }),
+    acceptRefund: builder.mutation({
+      query: (args: any) => {
+        return {
+        url: `order/accept-refund/${args.orderId}`,
+        method: "PUT",
+        body: {
+          status: args.status,
+        },
+        credentials: "include" as const,
+      }},
+    }),
   }),
 });
 
@@ -114,5 +125,6 @@ export const {
   useGetAllUserOrdersQuery,
   useLazyGetAllSellerOrdersQuery,
   useUpdateOrderStatusMutation,
-  useGiveRefundMutation
+  useGiveRefundMutation,
+  useAcceptRefundMutation
 } = OrderApi;

@@ -10,7 +10,7 @@ const SellerOrders = () => {
 
   const shopId = seller?.data?._id;
 
-  console.log(shopId, "Shop Id");
+  // console.log(shopId, "Shop Id");
 
   const [triggerQuery, { data, isLoading, isSuccess }] =
     useLazyGetAllSellerOrdersQuery(shopId);
@@ -25,7 +25,7 @@ const SellerOrders = () => {
         price: item?.totalPrice,
       };
     });
-  console.log(data?.data[0]?.cart[0].stock, "Data Table ");
+  // console.log(data?.data[0]?.cart[0].stock, "Data Table ");
 
   useEffect(() => {
     triggerQuery(shopId);

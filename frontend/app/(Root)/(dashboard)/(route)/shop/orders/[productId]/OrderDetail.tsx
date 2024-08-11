@@ -26,15 +26,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useUpdateOrderStatusMutation } from "@/redux/features/order/orderApi";
+import {
+  useAcceptRefundMutation,
+  useUpdateOrderStatusMutation,
+} from "@/redux/features/order/orderApi";
 import { useToast } from "@/components/ui/use-toast";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
 import { onOpen } from "@/redux/features/modal/commentModel";
 
 const OrderDetailComponents = () => {
   const [status, setStatus] = useState("");
 
-  const {push} = useRouter()
+  const { push } = useRouter();
 
   const { sellerOrders } = useSelector((state: any) => state.order);
   const dispatch = useDispatch();
@@ -44,11 +47,20 @@ const OrderDetailComponents = () => {
   const [updateOrderStatus, { isLoading, isSuccess, isError, error }] =
     useUpdateOrderStatusMutation();
 
+  const [
+    acceptRefund,
+    {
+      isLoading: isRefundLoading,
+      isSuccess: isRefundSuccess,
+      isError: isRefundError,
+      error: refundError,
+    },
+  ] = useAcceptRefundMutation();
+
   const { productId } = useParams();
 
   const data =
     sellerOrders && sellerOrders.find((item: any) => item._id === productId);
-
 
   const formattedDate = data?.createdAt
     ? new Date(data?.createdAt).toLocaleDateString("en-US", {
@@ -94,6 +106,9 @@ const OrderDetailComponents = () => {
       "Delivered",
     ].indexOf(data?.status)
   );
+  const refundStatus = ["Processing refund", "Refund success"].slice(
+    ["Processing refund", "Refund success"].indexOf(data?.status)
+  );
 
   const updateOrder = async () => {
     const OrderData: {
@@ -108,12 +123,28 @@ const OrderDetailComponents = () => {
       orderId: OrderData?.orderId,
       status: OrderData?.data,
     });
-    push("/shop/orders")  
+    push("/shop/orders");
+  };
+
+  const refundUpdateHandler = async () => {
+    const OrderData: {
+      orderId: string;
+      data: string;
+    } = {
+      orderId: data?._id,
+      data: status,
+    };
+
+    await acceptRefund({
+      orderId: OrderData?.orderId,
+      status: OrderData?.data,
+    });
+    push("/shop/refund");
   };
 
   const onCommentModel = () => {
-    dispatch(onOpen())
-  }
+    dispatch(onOpen());
+  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -123,13 +154,27 @@ const OrderDetailComponents = () => {
       });
     }
 
-    if (isError) {
+    if
+     (isError) {
       toast({
         title: "Order status updated failed.",
         variant: "destructive",
       });
     }
-  },[isSuccess, isError]);
+    if (isRefundSuccess) {
+      toast({
+        title: "Refund status updated successful.",
+        variant: "default",
+      });
+    }
+
+    if (isRefundError) {
+      toast({
+        title: "Refund status updated failed.",
+        variant: "destructive",
+      });
+    }
+  }, [isSuccess, isError, isRefundSuccess, isRefundError]);
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 flex flex-col items-center justify-center min-h-[calc(100vh_-_theme(spacing.8))]">
@@ -185,23 +230,64 @@ const OrderDetailComponents = () => {
           </div>
           <div className="pt-12 flex justify-end gap-3">
             <div>
-              <Select value={status} onValueChange={(e) => setStatus(e)}>
+              {data?.status === "Processing refund" ||
+              data?.status === "Refund success" ? (
+                <Select value={status} onValueChange={(e) => setStatus(e)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {refundStatus.map((item: any) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Select value={status} onValueChange={(e) => setStatus(e)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {Status.map((item: any) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+
+              {/* <Select value={status} onValueChange={(e) => setStatus(e)}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select a Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {Status.map((item: any) => (
+                    {refundStatus.map((item: any) => (
                       <SelectItem key={item} value={item}>
                         {item}
                       </SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
             <div>
-              <Button onClick={updateOrder}>Submit</Button>
+              <Button
+                onClick={
+                  data?.status !== "Processing refund"
+                    ? updateOrder
+                    : refundUpdateHandler
+                }
+              >
+                Submit
+              </Button>
             </div>
           </div>
         </div>

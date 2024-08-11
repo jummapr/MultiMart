@@ -181,6 +181,7 @@ export default function PaymentCard() {
   };
 
   const createCashOnDelivery = async () => {
+    // @ts-ignore
     order.paymentInfo = {
       type: "Cash On Delivery",
     };

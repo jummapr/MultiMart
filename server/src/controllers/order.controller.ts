@@ -186,3 +186,49 @@ export const orderRefund = asyncHandler(
       .json(new ApiResponse(200, "Order refund successful.", order));
   }
 );
+
+
+// Admin: accept the refund.
+
+export const adminAcceptRefund = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const {status} = req.body;
+
+    if (!orderId) {
+      throw new ApiError(400, "Order Id is required.");
+    }
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      throw new ApiError(400, "Order not found.");
+    }
+
+    order.status = status;
+
+    await order.save();
+
+    res.status(200).json(new ApiResponse(200, "Order refund accepted.", order));
+
+    if(status === "Refund success") {
+      order.cart.forEach(async (item: any) => {
+          await updateProduct(item._id, item.qty);
+      })
+    }
+
+    async function updateProduct(id: string, qty: number) {
+      const product = await Product.findById(id);
+
+      if (!product) {
+        throw new ApiError(404, "Product not found.");
+      }
+
+      product.stock += qty;
+      product.sold_out -= qty;
+
+      await product.save({ validateBeforeSave: false });
+    }
+
+   
+  });

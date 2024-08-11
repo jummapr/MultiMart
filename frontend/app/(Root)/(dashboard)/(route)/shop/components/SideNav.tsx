@@ -71,7 +71,7 @@ function SideNav() {
     {
       label: "Refunds",
       icon: CircleDollarSign,
-      href: "/shop/transaction",
+      href: "/shop/refund",
     },
     {
       label: "Settings",
