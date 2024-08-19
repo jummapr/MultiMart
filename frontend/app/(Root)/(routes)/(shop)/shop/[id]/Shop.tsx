@@ -3,7 +3,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Rating from "react-rating";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,15 @@ import { productData as ProductStaticData } from "@/static/data";
 import ProductCard from "@/components/comman/ProductCard";
 import { useAllSellerProductMutation, useGetShopInfoMutation } from "@/redux/features/shop/shopApi";
 import { useParams } from "next/navigation";
+import {onOpen} from "@/redux/features/modal/ShopUpdateModel";
 
 const Shop = () => {
   const params = useParams();
+
+  const { isOpen } = useSelector((state: any) => state.shopUpdateModel);
+
+  const dispatch = useDispatch();
+
   const { isSeller, seller } = useSelector((state: any) => state.seller);
   const { shopInfo } = useSelector((state: any) => state.shop);
   const productData = useSelector((state: any) => state.shop);
@@ -26,8 +32,8 @@ const Shop = () => {
     useGetShopInfoMutation();
 
   const shopId = params.id;
-  console.log(shopId)
-  console.log(shopInfo?.avatar?.url)
+  // console.log(shopId)
+  // console.log(shopInfo?.avatar?.url)
 
   const fetchedData = async () => {
     await getShopInfo(shopId);
@@ -35,6 +41,10 @@ const Shop = () => {
 
   const getAllProduct = async () => {
     await allSellerProduct(shopId);
+  };
+
+  const onOpenModel = () => {
+    dispatch(onOpen());
   };
 
   useEffect(() => {
@@ -104,7 +114,7 @@ const Shop = () => {
 
                 {isSeller && (
                   <div className="flex flex-col gap-4 py-11 px-6">
-                    <Button className="w-full">Edit Shop</Button>
+                    <Button className="w-full" onClick={onOpenModel}>Edit Shop</Button>
                     <Button className="w-full">Logout</Button>
                   </div>
                 )}

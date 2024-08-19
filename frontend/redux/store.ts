@@ -17,6 +17,7 @@ import addressModel from "./features/modal/addressModel";
 import paymentSlice from "./features/payment/paymentSlice";
 import orderSlice from "./features/order/orderSlice";
 import commentModel from "./features/modal/commentModel";
+import shopUpdateModel from "@/redux/features/modal/ShopUpdateModel";
 
 export const store = configureStore({
   reducer: {
@@ -37,6 +38,7 @@ export const store = configureStore({
     [authModel.reducerPath]:  authModel.reducer,
     [addressModel.reducerPath]:  addressModel.reducer,
     [commentModel.reducerPath]:  commentModel.reducer,
+    [shopUpdateModel.reducerPath]: shopUpdateModel.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

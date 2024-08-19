@@ -1,29 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 import PreViewModal from "../modal/preview-product";
 import CouponCodeModel from "../modal/coupon-code";
 import UpdateAvatar from "../modal/update-avatar";
 import AddressModel from "../modal/address";
 import CommentModel from "../modal/comment-model";
+import ShopEditModel from "@/components/modal/shop-edit-model";
 
 export const ModalProvider = () => {
-  const [isMounted, setIsMounted] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
-  if (!isMounted) return null;
+    if (!isMounted) return null;
 
-  return (
-    <>
-      <PreViewModal />
-      <CouponCodeModel />
-      <UpdateAvatar />
-      <AddressModel />
-      <CommentModel />
-    </>
-  );
+    return (
+        <>
+            <PreViewModal/>
+            <CouponCodeModel/>
+            <UpdateAvatar/>
+            <AddressModel/>
+            <CommentModel/>
+            <ShopEditModel/>
+        </>
+    );
 };

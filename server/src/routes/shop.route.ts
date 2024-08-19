@@ -4,7 +4,7 @@ import {
   activateShop,
   createShop,
   loadSellerUser,
-  shopLogout,
+  shopLogout, updateShop, updateShopAvatar,
 } from "../controllers/user.controller";
 import { upload } from "../middlewares/multer.middlewares";
 import { isAuthenticated, isSeller } from "../middlewares/auth.middlewares";
@@ -18,6 +18,7 @@ router.route("/shop-login").post(LoginToShop);
 router.route("/load-seller").get(isSeller, loadSellerUser);
 router.route("/logoutshop").get(isSeller, shopLogout);
 router.route("/get-shop-info/:id").get(getShopInfo)
-router.route("/get-all-seller-product/:id").get(isSeller,getAllProductFromShop)
-
+router.route("/get-all-seller-product/:id").get(isSeller,getAllProductFromShop);
+router.route("/update-shop").patch(isSeller, updateShop);
+router.route("/update-shop-avatar").patch(isSeller,upload.single("file"),updateShopAvatar);
 export default router;

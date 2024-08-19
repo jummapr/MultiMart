@@ -48,7 +48,6 @@ const shopSchema: Schema<IShop> = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
     },
     role: {
       type: String,

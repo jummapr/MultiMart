@@ -1,4 +1,4 @@
-import { ZodString, z } from "zod"
+import { z } from "zod"
 
 const profileSchema = z.object({
     name: z.string(),

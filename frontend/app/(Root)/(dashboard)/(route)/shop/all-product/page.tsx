@@ -56,7 +56,7 @@ const AllProduct = () => {
   const onModelOpenChange = () => {
     setOpen(false);
   };
-
+  
   useEffect(() => {
     getAllProduct();
   }, [deleteProductIsSuccess,seller]);
