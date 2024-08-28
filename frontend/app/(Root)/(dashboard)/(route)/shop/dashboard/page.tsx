@@ -53,7 +53,7 @@ function DashBoard() {
       data?.data?.reduce((acc: any, item: any) => acc + item.totalPrice, 0);
     const serviceCharge: any = totalEarnigWithoutTex * 0.1;
 
-    availableBalance = totalEarnigWithoutTex - serviceCharge.toFixed(2);
+    availableBalance = (totalEarnigWithoutTex - serviceCharge).toFixed(2);
   }
 
   useEffect(() => {

@@ -19,7 +19,7 @@ const FeaturedProducts = () => {
         {
           allProduct && allProduct.map((item: any, index: any) => (
             <>
-              <ProductMainCard data={item} /> 
+              <ProductMainCard data={item} key={index}/>
             </>
           ))
 

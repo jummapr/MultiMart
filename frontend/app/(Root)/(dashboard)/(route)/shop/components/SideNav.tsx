@@ -56,7 +56,7 @@ function SideNav() {
     {
       label: "Withdraw Money",
       icon: Banknote,
-      href: "/shop/transaction",
+      href: "/shop/withdraw-money",
     },
     {
       label: "Shop Inbox",
