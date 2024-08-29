@@ -4,7 +4,7 @@ import {Progress} from "@/components/ui/progress"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent} from "@/components/ui/card"
 
-interface UserReviewsProps {
+interface shopReviewsInteterface {
     expanded: boolean;
     setExpanded: (expanded: boolean) => void;
     reviewsData: any[];
@@ -12,7 +12,7 @@ interface UserReviewsProps {
     ratingCounts: Record<number, number>;
 }
 
-const UserReviews = ({expanded, setExpanded, reviewsData, averageRating, ratingCounts}: UserReviewsProps) => {
+const ShopReviews = ({expanded, setExpanded, reviewsData, averageRating, ratingCounts}: shopReviewsInteterface) => {
     return (
         <div className="w-full">
             <h1 className="text-3xl font-bold mb-6">Customer Reviews</h1>
@@ -109,4 +109,4 @@ const UserReviews = ({expanded, setExpanded, reviewsData, averageRating, ratingC
     )
 }
 
-export default UserReviews
+export default ShopReviews

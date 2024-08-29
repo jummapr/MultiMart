@@ -1,6 +1,6 @@
 "use client";
 
-import {Avatar, AvatarImage} from "@/components/ui/avatar";
+import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
 import {Card, CardContent} from "@/components/ui/card";
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -14,8 +14,10 @@ import ProductCard from "@/components/comman/ProductCard";
 import {useAllSellerProductMutation, useGetShopInfoMutation} from "@/redux/features/shop/shopApi";
 import {useParams} from "next/navigation";
 import {onOpen} from "@/redux/features/modal/ShopUpdateModel";
+import {Star, Phone, Package, Calendar} from 'lucide-react';
+import {Badge} from "@/components/ui/badge"
 import ProductMainCard from "@/components/comman/ProductMainCard";
-import UserReviews from "@/app/(Root)/(routes)/(shop)/shop/components/UserReviews";
+import ShopReviews from "@/app/(Root)/(routes)/(shop)/shop/components/ShopReviews";
 
 const shopData = {
     name: "Gadget Haven",
@@ -25,18 +27,18 @@ const shopData = {
     rating: 4.7,
     joinDate: "2021-03-15",
     products: [
-        { id: 1, name: "Smartphone X", price: 599, image: "/placeholder.svg?height=200&width=200" },
-        { id: 2, name: "Laptop Pro", price: 1299, image: "/placeholder.svg?height=200&width=200" },
-        { id: 3, name: "Wireless Earbuds", price: 129, image: "/placeholder.svg?height=200&width=200" },
+        {id: 1, name: "Smartphone X", price: 599, image: "/placeholder.svg?height=200&width=200"},
+        {id: 2, name: "Laptop Pro", price: 1299, image: "/placeholder.svg?height=200&width=200"},
+        {id: 3, name: "Wireless Earbuds", price: 129, image: "/placeholder.svg?height=200&width=200"},
     ],
     reviews: [
-        { id: 1, user: "Alice", rating: 5, comment: "Great products and service!" },
-        { id: 2, user: "Bob", rating: 4, comment: "Good experience overall." },
-        { id: 3, user: "Charlie", rating: 5, comment: "Excellent quality items." },
+        {id: 1, user: "Alice", rating: 5, comment: "Great products and service!"},
+        {id: 2, user: "Bob", rating: 4, comment: "Good experience overall."},
+        {id: 3, user: "Charlie", rating: 5, comment: "Excellent quality items."},
     ],
     events: [
-        { id: 1, name: "Summer Sale", date: "2023-07-01", description: "Up to 50% off on selected items" },
-        { id: 2, name: "New Arrivals Showcase", date: "2023-08-15", description: "Check out our latest gadgets" },
+        {id: 1, name: "Summer Sale", date: "2023-07-01", description: "Up to 50% off on selected items"},
+        {id: 2, name: "New Arrivals Showcase", date: "2023-08-15", description: "Check out our latest gadgets"},
     ],
 }
 
@@ -46,11 +48,46 @@ const Shop = () => {
 
     // dummy reviews data
     const reviewsData = [
-        { id: 1, name: 'Alice Johnson', rating: 5, date: '2023-08-01', text: 'Great products and excellent service! Will definitely shop here again.', avatar: '/placeholder.svg?height=40&width=40' },
-        { id: 2, name: 'Bob Smith', rating: 4, date: '2023-07-28', text: 'Good experience overall. Fast shipping and quality items.', avatar: '/placeholder.svg?height=40&width=40' },
-        { id: 3, name: 'Carol Davis', rating: 3, date: '2023-07-25', text: 'Decent shop. Some items were out of stock, but customer service was helpful.', avatar: '/placeholder.svg?height=40&width=40' },
-        { id: 4, name: 'David Brown', rating: 5, date: '2023-07-20', text: 'Exceptional quality and fast delivery. Highly recommended!', avatar: '/placeholder.svg?height=40&width=40' },
-        { id: 5, name: 'Eva Wilson', rating: 4, date: '2023-07-15', text: 'Very satisfied with my purchase. Will shop here again.', avatar: '/placeholder.svg?height=40&width=40' },
+        {
+            id: 1,
+            name: 'Alice Johnson',
+            rating: 5,
+            date: '2023-08-01',
+            text: 'Great products and excellent service! Will definitely shop here again.',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        {
+            id: 2,
+            name: 'Bob Smith',
+            rating: 4,
+            date: '2023-07-28',
+            text: 'Good experience overall. Fast shipping and quality items.',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        {
+            id: 3,
+            name: 'Carol Davis',
+            rating: 3,
+            date: '2023-07-25',
+            text: 'Decent shop. Some items were out of stock, but customer service was helpful.',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        {
+            id: 4,
+            name: 'David Brown',
+            rating: 5,
+            date: '2023-07-20',
+            text: 'Exceptional quality and fast delivery. Highly recommended!',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        {
+            id: 5,
+            name: 'Eva Wilson',
+            rating: 4,
+            date: '2023-07-15',
+            text: 'Very satisfied with my purchase. Will shop here again.',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
     ];
 
     // dummy reviews variables
@@ -103,6 +140,7 @@ const Shop = () => {
         dispatch(onOpen());
     };
 
+    // for showing the reviews on rewview tab.
     const allReviews = productData?.allProduct.map((i: any, index: number) => i.reviews).flat();
 
     useEffect(() => {
@@ -115,102 +153,77 @@ const Shop = () => {
     }, [isSeller]);
     return (
         <>
-            <div className="flex h-full w-full px-40 flex-col md:flex-row md:overflow-hidden">
-                <Card className="w-1/2 h-full mt-14 shadow-md">
-                    <CardContent className="pt-12 overflow-y-auto">
-                        <div className="flex flex-col items-center gap-2">
-                            <Avatar className="w-28 h-28">
-                                <AvatarImage src={shopInfo?.avatar?.url}/>
+            <div className="container mx-auto px-4 py-8">
+                <Card className="mb-8">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                            <Avatar className="w-32 h-32">
+                                <AvatarImage src={shopInfo?.avatar?.url} alt={shopData.name}/>
+                                <AvatarFallback>{shopInfo?.shopName?.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <h3 className="font-semibold">{shopInfo?.shopName}</h3>
-                        </div>
-                        <p className="text-sm pt-6 text-justify">
-                            {shopInfo?.description}
-                        </p>
-                        <div className="flex flex-col pt-5">
-                            <h4 className="text-md font-semibold">Address</h4>
-                            <h3>{shopInfo?.address}</h3>
-                        </div>
-                        <div className="flex flex-col pt-5">
-                            <h4 className="text-md font-semibold">Phone Number</h4>
-                            <h3>{shopInfo?.phonenumber}</h3>
-                        </div>
-                        <div className="flex flex-col pt-5">
-                            <h4 className="text-md font-semibold">Total Product</h4>
-                            <h3>{productData?.allProduct.length}</h3>
-                        </div>
-                        <div className="flex flex-col pt-5">
-                            <h4 className="text-md font-semibold">Shop Ratings</h4>
-                            <div className="flex gap-3">
-                                {/* @ts-ignore */}
-                                <Rating
-                                    initialRating={averageRating}
-                                    readonly
-                                    emptySymbol={
-                                        <Image
-                                            src={"/icons/Vector.png"}
-                                            alt="rattingStarIcons"
-                                            width={16}
-                                            height={16}
-                                        />
-                                    }
-                                    fullSymbol={
-                                        <Image
-                                            src={"/icons/fieldstar.png"}
-                                            alt="rattingStarIcons"
-                                            width={16}
-                                            height={16}
-                                        />
-                                    }
-                                />
-                                <h2>{averageRating}</h2>
-                            </div>
-                            <div className="flex flex-col pt-5">
-                                <h4 className="text-md font-semibold">Joined On</h4>
-                                <h3>{shopInfo?.createdAt?.slice(0, 10)}</h3>
-                            </div>
-
-                            {isSeller && (
-                                <div className="flex flex-col gap-4 py-11 px-6">
-                                    <Button className="w-full" onClick={onOpenModel}>Edit Shop</Button>
-                                    <Button className="w-full">Logout</Button>
+                            <div className="flex-grow text-center md:text-left">
+                                <h1 className="text-3xl font-bold mb-2">{shopInfo?.shopName}</h1>
+                                <div className="flex items-center justify-center md:justify-start mb-2">
+                                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 mr-1"/>
+                                    <span className="font-semibold">{averageRating}</span>
                                 </div>
-                            )}
+                                <div
+                                    className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600">
+                                    <div className="flex items-center">
+                                        <Phone className="w-4 h-4 mr-1"/>
+                                        {shopInfo?.phoneNumber}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Package className="w-4 h-4 mr-1"/>
+                                        {productData?.allProduct.length} products
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Calendar className="w-4 h-4 mr-1"/>
+                                        Joined on {new Date(shopInfo?.createdAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <div className="px-6 mt-14 w-full">
-                    <Tabs defaultValue="shopProducts" className="w-[100%]">
-                        <TabsList className="grid w-full grid-cols-3">
-                            <TabsTrigger value="shopProducts" className="w-full">
-                                Shop Products{" "}
-                            </TabsTrigger>
-                            <TabsTrigger value="shopEvents">Shop Events</TabsTrigger>
-                            <TabsTrigger value="shopReviews">Shop Reviews</TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                            value="shopProducts"
-                            className="w-full grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-9 xl:grid-cols-3 xl:gap-[20px] "
-                        >
-                            {productData?.allProduct && productData?.allProduct.map((i: any, index: number) =>
-                                <ProductMainCard data={i} key={index}/>
-                            )}
-                        </TabsContent>
-                        <TabsContent
-                            value="shopEvents"
-                            className="w-full grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-9 xl:grid-cols-3 xl:gap-[20px] "
-                        >
-                            {ProductStaticData && ProductStaticData.map((i: any, index: number) => <ProductCard/>)}
-                        </TabsContent>
-                        <TabsContent
-                            value="shopReviews"
-                            className="w-full gap-5 pb-10"
-                        >
-                            <UserReviews expanded={expanded} setExpanded={setExpanded} reviewsData={reviewsData} averageRating={dummyaverageRating} ratingCounts={dummyratingCounts}/>
-                        </TabsContent>
-                    </Tabs>
-                </div>
+                <Tabs defaultValue="products" className="w-full" onValueChange={setActiveTab}>
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="products">Products</TabsTrigger>
+                        <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                        <TabsTrigger value="events">Events</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="products">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                            {productData?.allProduct.map((product: any, index: number) =>
+                                <ProductMainCard data={product} key={index}/>
+                            )
+                            }
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="reviews">
+                        <div className="space-y-6 mt-6">
+                            <ShopReviews reviewsData={reviewsData} expanded={expanded} setExpanded={setExpanded}
+                                         averageRating={dummyaverageRating} ratingCounts={dummyratingCounts}/>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="events">
+                        <div className="space-y-6 mt-6">
+                            {shopData.events.map((event) => (
+                                <Card key={event.id}>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h3 className="font-semibold text-lg">{event.name}</h3>
+                                            <Badge
+                                                variant="secondary">{new Date(event.date).toLocaleDateString()}</Badge>
+                                        </div>
+                                        <p className="text-gray-600">{event.description}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </>
     );
