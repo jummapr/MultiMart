@@ -61,7 +61,7 @@ function SideNav() {
     {
       label: "Shop Inbox",
       icon: MessageSquareMore,
-      href: "/shop/transaction",
+      href: "/shop/inbox",
     },
     {
       label: "Discount Coupon",
