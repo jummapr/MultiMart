@@ -64,7 +64,7 @@ export default function ChatList() {
 
     const onHandleClick = (id: string) => {
         setSelectedChat(id)
-        router.push(`/shop/inbox/chat/${id}`)
+        router.push(`/chat/${id}`);
     }
 
     return (
